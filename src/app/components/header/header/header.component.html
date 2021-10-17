@@ -1,0 +1,17 @@
+<mat-toolbar color="primary">
+    <mat-toolbar-row>
+        <button mat-flat-button color="primary">
+            <mat-icon>download</mat-icon>
+            Download file
+        </button>
+
+        <!--Used to make file input possible. Its not displayed though -->
+        <input #fileInputElement class="file-input" type="file" (change)="this.fileHandleChanged($event)" accept=".txt,.TM">
+
+        <button mat-flat-button color="primary" (click)="fileInputElement.click()">
+            <mat-icon>upload</mat-icon>
+            Upload file
+        </button>
+
+    </mat-toolbar-row>
+</mat-toolbar>
