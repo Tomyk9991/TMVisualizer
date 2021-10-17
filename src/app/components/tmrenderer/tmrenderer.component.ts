@@ -58,12 +58,11 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
             console.log(tm);
 
             for (let i = 0; i < tm.states.length; i++) {
-                let x: number = <number>TMRendererComponent.p5?.random(50, TMRendererComponent.screenWidth - 50);
-                let y: number = <number>TMRendererComponent.p5?.random(50,  TMRendererComponent.screenHeight - 50);
-
+                // let x: number = <number>TMRendererComponent.p5?.random(50, TMRendererComponent.screenWidth - 50);
+                // let y: number = <number>TMRendererComponent.p5?.random(50,  TMRendererComponent.screenHeight - 50);
                 let margin: number = 60;
-                // let x: number = <number>TMRendererComponent.p5?.map(i, 0, tm.states.length - 1, margin, TMRendererComponent.screenWidth - margin);
-                // let y: number = TMRendererComponent.screenHeight / 2;
+                let x: number = <number>TMRendererComponent.p5?.map(i, 0, tm.states.length - 1, margin, TMRendererComponent.screenWidth - margin);
+                let y: number = TMRendererComponent.screenHeight / 2;
 
                 let pos: p5.Vector = <p5.Vector>TMRendererComponent.p5?.createVector(x, y);
 
@@ -85,21 +84,8 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
         p.draw = () => {
             draw(p);
         };
-
-        p.mouseWheel = (event: any) => {
-            zoom += sens * event.delta;
-
-            zoom = <number>TMRendererComponent.p5?.constrain(zoom, zMin, zMax);
-            return false;
-        }
     }
 }
-
-// Scrolling
-let zoom: number = 1.0;
-let zMin: number = 0.05;
-let zMax: number = 9.0;
-let sens = 0.005;
 
 // TM
 let stateDrawers: StateDrawer[] = [];

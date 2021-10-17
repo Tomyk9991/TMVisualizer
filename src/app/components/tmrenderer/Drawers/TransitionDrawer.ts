@@ -8,8 +8,8 @@ export default class TransitionDrawer implements IDrawer {
     private static readonly radiusY: number = 17;
     private static readonly initialOffset: number = 5;
     private static readonly vertexRadius: number = 4;
-    private static readonly drawingColor: any = {r: 255, g: 102, b: 0};
-    private static readonly localMin: number = 100;
+    private static readonly localMin: number = 300;
+    private static drawingColor: any = {r: 194, g: 24, b: 91};
     private static maxDiameter: number = 0;
 
 
@@ -19,13 +19,27 @@ export default class TransitionDrawer implements IDrawer {
 
     constructor(private transition: Transition, private currentStateDrawer: StateDrawer, private nextStateDrawer: StateDrawer, private ctx: p5) {
         if(TransitionDrawer.maxDiameter === 0) {
-            TransitionDrawer.maxDiameter = Math.sqrt(ctx.width * ctx.width + ctx.height * ctx.height)
+            TransitionDrawer.maxDiameter = Math.sqrt(ctx.width * ctx.width + ctx.height * ctx.height);
+
+            TransitionDrawer.drawingColor = {r: 255, g: 102, b: 0};
+            TransitionDrawer.drawingColor = this.hexToRGB(getComputedStyle(document.documentElement).getPropertyValue("--primary").trim());
         }
 
-        this.textPosition = ctx.createVector(
-            this.currentStateDrawer.position.x,
-            this.currentStateDrawer.position.y - this.currentStateDrawer.circleRadius - (TransitionDrawer.radiusY * 2)
-        );
+
+        if (this.transition.currentState === this.transition.nextState) {
+            this.textPosition = ctx.createVector(
+                this.currentStateDrawer.position.x,
+                this.currentStateDrawer.position.y - this.currentStateDrawer.circleRadius - (TransitionDrawer.radiusY * 2)
+            );
+        } else {
+            let textPos = this.linearTransformationLerp(0.5);
+
+
+            this.textPosition = ctx.createVector(
+                textPos.x,
+                textPos.y
+            );
+        }
 
         while (true) {
             let contains: boolean = TransitionDrawer.positions.filter(vec => p5.Vector.dist(vec, this.textPosition) <= 3).length > 0;
@@ -37,6 +51,37 @@ export default class TransitionDrawer implements IDrawer {
                 break;
             }
         }
+    }
+
+    private hexToRGB(hex: string): any {
+        let shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+            return r + r + g + g + b + b;
+        });
+
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    private linearTransformationLerp(lerpValue: number): p5.Vector {
+        let direction: p5.Vector = p5.Vector.sub(this.nextStateDrawer.position, this.currentStateDrawer.position);
+
+        let start: p5.Vector = p5.Vector.add(this.currentStateDrawer.position, direction.setMag(this.currentStateDrawer.circleRadius));
+        let end: p5.Vector = p5.Vector.add(this.nextStateDrawer.position, direction.mult(-1).setMag(this.nextStateDrawer.circleRadius));
+
+        let dist: number = p5.Vector.dist(start, end);
+        let amplitude: number = this.ctx.map(dist, 0, TransitionDrawer.maxDiameter, 0, TransitionDrawer.localMin);
+
+        let dirNor: p5.Vector = direction.normalize();
+
+        let position: p5.Vector = p5.Vector.lerp(start, end, lerpValue);
+        position.y -= this.ctx.lerp(0, amplitude, dirNor.x);
+        position.x += this.ctx.lerp(0, amplitude, dirNor.y);
+        return position;
     }
 
     public draw(p: any, ctx: p5): void {
@@ -75,11 +120,6 @@ export default class TransitionDrawer implements IDrawer {
             p.curve(edgeRight.x, edgeRight.y, edgeLeft.x, edgeLeft.y, end.x, end.y, end.x, end.y);
 
             this.drawTriangleEnd(p, ctx, edgeLeft, end, TransitionDrawer.vertexRadius);
-
-            p.stroke(255);
-            p.fill(255);
-            p.strokeWeight(0.01);
-            p.text(this.transition.predicate + "|" + this.transition.manipulationValue + ", " + <string>this.transition.direction, this.textPosition.x, this.textPosition.y);
         } else {
             let direction: p5.Vector = p5.Vector.sub(this.nextStateDrawer.position, this.currentStateDrawer.position);
             p.strokeWeight(8);
@@ -87,18 +127,8 @@ export default class TransitionDrawer implements IDrawer {
             let start: p5.Vector = p5.Vector.add(this.currentStateDrawer.position, direction.setMag(this.currentStateDrawer.circleRadius));
             let end: p5.Vector = p5.Vector.add(this.nextStateDrawer.position, direction.mult(-1).setMag(this.nextStateDrawer.circleRadius));
 
-            let dist: number = p5.Vector.dist(start, end);
-            let amplitude: number = ctx.map(dist, 0, TransitionDrawer.maxDiameter, 0, TransitionDrawer.localMin);
-
-            let dirNor: p5.Vector = direction.normalize();
-
-            let edge1: p5.Vector = p5.Vector.lerp(start, end, 0.33);
-            edge1.y -= ctx.lerp(0, amplitude, dirNor.x);
-            edge1.x += ctx.lerp(0, amplitude, dirNor.y);
-
-            let edge2: p5.Vector = p5.Vector.lerp(start, end, 0.66);
-            edge2.y -= ctx.lerp(0, amplitude, dirNor.x);
-            edge2.x += ctx.lerp(0, amplitude, dirNor.y);
+            let edge1: p5.Vector = this.linearTransformationLerp(0.33);
+            let edge2: p5.Vector = this.linearTransformationLerp(0.66);
 
             p.strokeWeight(8);
             p.stroke(0);
@@ -112,6 +142,12 @@ export default class TransitionDrawer implements IDrawer {
 
             this.drawTriangleEnd(p, ctx, edge2, end, TransitionDrawer.vertexRadius * 2);
         }
+
+
+        p.stroke(255);
+        p.fill(255);
+        p.strokeWeight(0.01);
+        p.text(this.transition.predicate + "|" + this.transition.manipulationValue + ", " + <string>this.transition.direction, this.textPosition.x, this.textPosition.y);
     }
 
     private drawTriangleEnd(p: any, ctx: p5, start: any, end: any, vertexRadius: number) {
