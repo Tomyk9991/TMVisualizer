@@ -2,21 +2,24 @@ import State from "./State";
 
 
 export enum TMDirection {
-    Left,
-    Right,
-    Noop,
-    NotInitialized
+    Left = "L",
+    Right = "R",
+    Noop = "N",
+    NotInitialized = "~"
 }
 
 export default class Transition {
-    private direction: TMDirection = TMDirection.NotInitialized;
+    private _direction: TMDirection = TMDirection.NotInitialized;
 
     constructor(private _currentState: State, private _predicate: string, private _nextState: State, private _manipulationValue: string, direction: string) {
-        if (direction === "L") { this.direction = TMDirection.Left; }
-        else if (direction === "R") { this.direction = TMDirection.Right; }
-        else if (direction === "N") { this.direction = TMDirection.Noop; }
+        if (direction === "L") { this._direction = TMDirection.Left; }
+        else if (direction === "R") { this._direction = TMDirection.Right; }
+        else if (direction === "N") { this._direction = TMDirection.Noop; }
     }
-
+    
+    get direction(): TMDirection {
+        return this._direction;
+    }
 
     get currentState(): State {
         return this._currentState;

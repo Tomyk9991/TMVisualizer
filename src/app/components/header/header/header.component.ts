@@ -57,41 +57,26 @@ export class HeaderComponent implements OnInit {
             "\"\"\"Abgabe:\"\"\"\n" +
             "\n" +
             "# Geben Sie hier das Eingabealphabet an.\n" +
-            "input_alphabet = \ta,b\n" +
+            "input_alphabet = \ta,b,c\n" +
             "\n" +
             "# Geben Sie hier die Transitionen an.\n" +
-            "transitions =\t\tq_0, a      -> q_a , a_$, R\n" +
-            "\t\t\t\t\tq_0, b      -> q_b , b_$, R\n" +
-            "\t\t\t\t\tq_0, a'     -> q_clean , a, R\t\n" +
-            "\t\t\t\t\tq_0, b'     -> q_clean , b, R\t\n" +
-            "\t\t\t\t\tq_0, _      -> q_e , _, N\n" +
+            "transitions =\t\t\t\t\tq_0, $      -> q_0 , $, R\n" +
+            "\t\t\t\t\tq_0, _      -> q_e , _, N\t\n" +
+            "\t\t\t\t\tq_0, a      -> q_1 , b, R\t\n" +
             "\t\t  \n" +
-            "\t\t\t\t\tq_a, a      -> q_a , a, R\t\n" +
-            "\t\t\t\t\tq_a, b      -> q_a , b, R\n" +
-            "\t\t\t\t\tq_a, a'     -> q_a , a', R\n" +
-            "\t\t\t\t\tq_a, b'     -> q_a , b', R\n" +
-            "\t\t\t\t\tq_a, _      -> q_back , a', N\n" +
+            "\t\t\t\t\tq_1, $      -> q_1 , $, R\t\n" +
+            "\t\t\t\t\tq_1, a      -> q_1 , a, R\n" +
+            "\t\t\t\t\tq_1, b      -> q_2 , $, R\n" +
             "\n" +
-            "\t\t\t\t\tq_b, a      -> q_b , a, R\t\n" +
-            "\t\t\t\t\tq_b, b      -> q_b , b, R\n" +
-            "\t\t\t\t\tq_b, a'     -> q_b , a', R\n" +
-            "\t\t\t\t\tq_b, b'     -> q_b , b', R\n" +
-            "\t\t\t\t\tq_b, _      -> q_back , b', N\n" +
+            "\t\t\t\t\tq_2, $      -> q_2 , $, R\t\n" +
+            "\t\t\t\t\tq_2, b      -> q_2 , b, R\n" +
+            "\t\t\t\t\tq_2, c      -> q_back , $, N\n" +
             "\n" +
-            "\t\t\t\t\tq_back, a   -> q_back , a, L\t\n" +
-            "\t\t\t\t\tq_back, b   -> q_back , b, L\n" +
-            "\t\t\t\t\tq_back, a'  -> q_back , a', L\n" +
-            "\t\t\t\t\tq_back, b'  -> q_back , b', L\n" +
-            "\t\t\t\t\tq_back, a_$ -> q_0 , a, R\n" +
-            "\t\t\t\t\tq_back, b_$ -> q_0 , b, R\n" +
-            "\n" +
-            "\t\t\t\t\tq_clean, a' -> q_clean , a, R\n" +
-            "\t\t\t\t\tq_clean, b' -> q_clean , b, R\n" +
-            "\t\t\t\t\tq_clean, _  -> q_head , _, L\n" +
-            "\t\t\t\t  \n" +
-            "\t\t\t\t\tq_head, a   -> q_head , a, L\n" +
-            "\t\t\t\t\tq_head, b   -> q_head , b, L\n" +
-            "\t\t\t\t\tq_head, _   -> q_e, _, R\n" +
+            "\t\t\t\t\tq_back, $   -> q_back , $, L\t\n" +
+            "\t\t\t\t\tq_back, a   -> q_back , a, L\n" +
+            "\t\t\t\t\tq_back, b   -> q_back , b', L\n" +
+            "\t\t\t\t\tq_back, c   -> q_back , c', L\n" +
+            "\t\t\t\t\tq_back, _   -> q_0 , _, R\n" +
             "\n" +
             "# Geben Sie hier den Startzustand an.             \n" +
             "start_state = \tq_0\n" +

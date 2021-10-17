@@ -10,9 +10,9 @@ import {MatDividerModule} from "@angular/material/divider";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {MatFormFieldModule} from "@angular/material/form-field";
-import { HeaderComponent } from './components/header/header/header.component';
+import {HeaderComponent} from './components/header/header/header.component';
 import {MatToolbarModule} from "@angular/material/toolbar";
-import { TMRendererComponent } from './components/tmrenderer/tmrenderer.component';
+import {TMRendererComponent} from './components/tmrenderer/tmrenderer.component';
 
 @NgModule({
     declarations: [

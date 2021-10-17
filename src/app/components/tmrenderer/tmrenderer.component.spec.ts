@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { TMRendererComponent } from './tmrenderer.component';
+import {TMRendererComponent} from './tmrenderer.component';
 
 describe('TMRendererComponent', () => {
   let component: TMRendererComponent;

@@ -5,6 +5,8 @@ import TuringMachine from "../../../model/TM/TuringMachine";
 import StateDrawer from "./Drawers/StateDrawer";
 import TransitionDrawer from "./Drawers/TransitionDrawer";
 import IDrawer from "./Drawers/IDrawer";
+import Transition from "../../../model/TM/Transition";
+import State from "../../../model/TM/State";
 
 @Component({
     selector: 'app-tmrenderer',
@@ -21,7 +23,7 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
 
     constructor(private renderer: TMRendererService) {
         this.getScreenSize();
-        this.renderer.OnRegisterRender.on((data:TuringMachine) => {
+        this.renderer.OnRegisterRender.on((data: TuringMachine) => {
             TMRendererComponent.TM = data;
         })
     }
@@ -53,12 +55,17 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
 
             let tm: TuringMachine = <TuringMachine>TMRendererComponent.TM;
 
+            console.log(tm);
 
             for (let i = 0; i < tm.states.length; i++) {
-                let randomX: number = <number>TMRendererComponent.p5?.random(50, TMRendererComponent.screenWidth - 50);
-                let randomY: number = <number>TMRendererComponent.p5?.random(50,  TMRendererComponent.screenHeight - 50);
+                let x: number = <number>TMRendererComponent.p5?.random(50, TMRendererComponent.screenWidth - 50);
+                let y: number = <number>TMRendererComponent.p5?.random(50,  TMRendererComponent.screenHeight - 50);
 
-                let pos: p5.Vector = <p5.Vector>TMRendererComponent.p5?.createVector(randomX, randomY);
+                let margin: number = 60;
+                // let x: number = <number>TMRendererComponent.p5?.map(i, 0, tm.states.length - 1, margin, TMRendererComponent.screenWidth - margin);
+                // let y: number = TMRendererComponent.screenHeight / 2;
+
+                let pos: p5.Vector = <p5.Vector>TMRendererComponent.p5?.createVector(x, y);
 
                 let stateDrawer: StateDrawer = new StateDrawer(tm.states[i], pos);
                 stateDrawers.push(stateDrawer);
@@ -66,15 +73,15 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
             }
 
             for (let i = 0; i < tm.transitions.length; i++) {
-                let currentStateDrawer: StateDrawer = <StateDrawer>stateDrawers.find((drawer :StateDrawer) => drawer.state === tm.transitions[i].currentState);
-                let nextStateDrawer: StateDrawer = <StateDrawer>stateDrawers.find((drawer:StateDrawer) => drawer.state === tm.transitions[i].nextState);
+                let currentStateDrawer: StateDrawer = <StateDrawer>stateDrawers.find((drawer: StateDrawer) => drawer.state === tm.transitions[i].currentState);
+                let nextStateDrawer: StateDrawer = <StateDrawer>stateDrawers.find((drawer: StateDrawer) => drawer.state === tm.transitions[i].nextState);
 
-                let transitionDrawer: TransitionDrawer = new TransitionDrawer(tm.transitions[i], currentStateDrawer, nextStateDrawer);
+                let transitionDrawer: TransitionDrawer = new TransitionDrawer(tm.transitions[i], currentStateDrawer, nextStateDrawer, <p5>TMRendererComponent.p5);
+
                 transitionsDrawers.push(transitionDrawer);
                 drawQueue.push(transitionDrawer);
-            }
-
         };
+            }
         p.draw = () => {
             draw(p);
         };

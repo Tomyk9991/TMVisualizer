@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { TMRendererService } from './t-m-renderer.service';
+import {TMRendererService} from './t-m-renderer.service';
 
 describe('TMRendererService', () => {
   let service: TMRendererService;
