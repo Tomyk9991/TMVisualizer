@@ -4,6 +4,8 @@ import * as p5 from "p5";
 import StateDrawer from "./StateDrawer";
 import {hexToRGB} from "../../../../utils/utilFunctions";
 import IRenderPipelineComponent from "./IRenderPipelineComponent";
+import RenderPipelineManager from "./managers/RenderPipelineManager";
+import DrawerManager from "./managers/DrawerManager";
 
 class TextColorPair {
     constructor(public text: string, public color: any) {
@@ -37,9 +39,11 @@ export default class TransitionDrawer implements IDrawer, IRenderPipelineCompone
         b: 91 + 100,
     };
 
-
-
     constructor(private transition: Transition, private currentStateDrawer: StateDrawer, private nextStateDrawer: StateDrawer, private ctx: p5) {
+        RenderPipelineManager.rpcs.push(this);
+        DrawerManager.drawQueue.push(this);
+
+
         if (TransitionDrawer.maxDiameter === 0) {
             TransitionDrawer.maxDiameter = Math.sqrt(ctx.width * ctx.width + ctx.height * ctx.height);
 
@@ -166,10 +170,6 @@ export default class TransitionDrawer implements IDrawer, IRenderPipelineCompone
         ], this.textPosition.x, this.textPosition.y);
     }
 
-    interact(p: any, ctx: p5): void {
-
-    }
-
     private colorText(text_array: TextColorPair[], x: number, y: number): void {
         let pos_x: number = x - 30;
 
@@ -180,7 +180,6 @@ export default class TransitionDrawer implements IDrawer, IRenderPipelineCompone
             let t: string = part.text;
             let c: any = part.color;
             let w: number = (Math.ceil(t.length / 2)) * 20;
-            console.log(t.length);
             this.ctx.fill(c.r, c.g, c.b);
             this.ctx.text(t, pos_x, y);
             pos_x += w;

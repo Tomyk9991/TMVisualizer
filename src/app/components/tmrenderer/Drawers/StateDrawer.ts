@@ -1,8 +1,13 @@
 import State, {FinalState} from "../../../../model/TM/State";
 import * as p5 from "p5";
 import IDrawer from "./IDrawer";
+import DrawerManager from "./managers/DrawerManager";
+import IInteractable from "./IInteractable";
+import InteractableManager from "./managers/InteractableManager";
+import IKeyboardCallback from "./IKeyboardCallback";
+import KeyboardCallbackManager from "./managers/KeyboardCallbackManager";
 
-export default class StateDrawer implements IDrawer {
+export default class StateDrawer implements IDrawer, IInteractable, IKeyboardCallback {
     private static readonly minFontSize: number = 4;
     private static readonly maxFontSize: number = 30;
     private static readonly circleDiameter: number = 55;
@@ -15,6 +20,9 @@ export default class StateDrawer implements IDrawer {
     private static targetInstance: StateDrawer | null = null;
 
     constructor(private _state: State, private _position: p5.Vector) {
+        DrawerManager.drawQueue.push(this);
+        InteractableManager.interactables.push(this);
+        KeyboardCallbackManager.callbacks.push(this);
     }
 
     get state(): State { return this._state; }
@@ -74,6 +82,11 @@ export default class StateDrawer implements IDrawer {
                 this.position.x = p.mouseX;
                 this.position.y = p.mouseY;
             }
+        }
+    }
+
+    keyPressed(ctx: p5, key: string): void {
+        if (this.mouseOverlapping && key == ' ') {
         }
     }
 }

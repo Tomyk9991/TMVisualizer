@@ -4,11 +4,11 @@ import {TMRendererService} from "../../services/t-m-renderer.service";
 import TuringMachine from "../../../model/TM/TuringMachine";
 import StateDrawer from "./Drawers/StateDrawer";
 import TransitionDrawer from "./Drawers/TransitionDrawer";
-import IDrawer from "./Drawers/IDrawer";
-import Transition from "../../../model/TM/Transition";
-import State from "../../../model/TM/State";
-import IRenderPipelineComponent from "./Drawers/IRenderPipelineComponent";
 import TextDescriptionDrawer from "./Drawers/TextDescriptionDrawer";
+import RenderPipelineManager from "./Drawers/managers/RenderPipelineManager";
+import DrawerManager from "./Drawers/managers/DrawerManager";
+import InteractableManager from "./Drawers/managers/InteractableManager";
+import KeyboardCallbackManager from "./Drawers/managers/KeyboardCallbackManager";
 
 @Component({
     selector: 'app-tmrenderer',
@@ -59,7 +59,7 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
 
             console.log(tm);
 
-            drawQueue.push(new TextDescriptionDrawer());
+            new TextDescriptionDrawer(); // putting it in the constructor
 
 
             for (let i = 0; i < tm.states.length; i++) {
@@ -73,7 +73,6 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
 
                 let stateDrawer: StateDrawer = new StateDrawer(tm.states[i], pos);
                 stateDrawers.push(stateDrawer);
-                drawQueue.push(stateDrawer);
             }
 
             for (let i = 0; i < tm.transitions.length; i++) {
@@ -83,12 +82,16 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
                 let transitionDrawer: TransitionDrawer = new TransitionDrawer(tm.transitions[i], currentStateDrawer, nextStateDrawer, <p5>TMRendererComponent.p5);
 
                 transitionsDrawers.push(transitionDrawer);
-                drawQueue.push(transitionDrawer);
-                rpcs.push(transitionDrawer);
-        };
             }
+        };
         p.draw = () => {
             draw(p);
+        };
+
+        p.keyPressed = (event: any) => {
+            for (let i = 0; i < KeyboardCallbackManager.callbacks.length; i++) {
+                KeyboardCallbackManager.callbacks[i].keyPressed(<p5>TMRendererComponent.p5, event.key);
+            }
         };
     }
 }
@@ -97,22 +100,22 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
 let stateDrawers: StateDrawer[] = [];
 let transitionsDrawers: TransitionDrawer[] = [];
 
-let drawQueue: IDrawer[] = [];
-let rpcs: IRenderPipelineComponent[] = [];
-
 function draw(p: any): void {
     p.background('#303030');
 
-    for (let i = 0; i < rpcs.length; i++) {
-        rpcs[i].onStartFrame();
+    for (let i = 0; i < RenderPipelineManager.rpcs.length; i++) {
+        RenderPipelineManager.rpcs[i].onStartFrame();
     }
 
-    for (let i = 0; i < drawQueue.length; i++) {
-        drawQueue[i].interact(p, <p5>TMRendererComponent.p5);
-        drawQueue[i].draw(p, <p5>TMRendererComponent.p5);
+    for (let i = 0; i < InteractableManager.interactables.length; i++) {
+        InteractableManager.interactables[i].interact(p, <p5>TMRendererComponent.p5);
     }
 
-    for (let i = 0; i < rpcs.length; i++) {
-        rpcs[i].onFinishFrame();
+    for (let i = 0; i < DrawerManager.drawQueue.length; i++) {
+        DrawerManager.drawQueue[i].draw(p, <p5>TMRendererComponent.p5);
+    }
+
+    for (let i = 0; i < RenderPipelineManager.rpcs.length; i++) {
+        RenderPipelineManager.rpcs[i].onFinishFrame();
     }
 }
