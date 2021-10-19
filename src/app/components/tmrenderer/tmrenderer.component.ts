@@ -8,6 +8,7 @@ import IDrawer from "./Drawers/IDrawer";
 import Transition from "../../../model/TM/Transition";
 import State from "../../../model/TM/State";
 import IRenderPipelineComponent from "./Drawers/IRenderPipelineComponent";
+import TextDescriptionDrawer from "./Drawers/TextDescriptionDrawer";
 
 @Component({
     selector: 'app-tmrenderer',
@@ -57,6 +58,9 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
             let tm: TuringMachine = <TuringMachine>TMRendererComponent.TM;
 
             console.log(tm);
+
+            drawQueue.push(new TextDescriptionDrawer());
+
 
             for (let i = 0; i < tm.states.length; i++) {
                 // let x: number = <number>TMRendererComponent.p5?.random(50, TMRendererComponent.screenWidth - 50);

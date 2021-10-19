@@ -5,6 +5,11 @@ import StateDrawer from "./StateDrawer";
 import {hexToRGB} from "../../../../utils/utilFunctions";
 import IRenderPipelineComponent from "./IRenderPipelineComponent";
 
+class TextColorPair {
+    constructor(public text: string, public color: any) {
+    }
+}
+
 export default class TransitionDrawer implements IDrawer, IRenderPipelineComponent {
     private static readonly radiusX: number = 10;
     private static readonly radiusY: number = 17;
@@ -20,8 +25,22 @@ export default class TransitionDrawer implements IDrawer, IRenderPipelineCompone
     private textPosition: p5.Vector;
 
 
+    private baseColorText: any = {
+        r: 255,
+        g: 255,
+        b: 255,
+    };
+
+    private highlightColorText: any = {
+        r: 194 + 100,
+        g: 24 + 100,
+        b: 91 + 100,
+    };
+
+
+
     constructor(private transition: Transition, private currentStateDrawer: StateDrawer, private nextStateDrawer: StateDrawer, private ctx: p5) {
-        if(TransitionDrawer.maxDiameter === 0) {
+        if (TransitionDrawer.maxDiameter === 0) {
             TransitionDrawer.maxDiameter = Math.sqrt(ctx.width * ctx.width + ctx.height * ctx.height);
 
             TransitionDrawer.drawingColor = {r: 255, g: 102, b: 0};
@@ -36,7 +55,7 @@ export default class TransitionDrawer implements IDrawer, IRenderPipelineCompone
     }
 
     onFinishFrame(): void {
-        if(!TransitionDrawer.cleanUpPositions) {
+        if (!TransitionDrawer.cleanUpPositions) {
             TransitionDrawer.positions = [];
             TransitionDrawer.cleanUpPositions = true;
         }
@@ -137,11 +156,37 @@ export default class TransitionDrawer implements IDrawer, IRenderPipelineCompone
         p.stroke(255);
         p.fill(255);
         p.strokeWeight(0.01);
-        p.text(this.transition.predicate + "|" + this.transition.manipulationValue + ", " + <string>this.transition.direction, this.textPosition.x, this.textPosition.y);
+
+        this.colorText([
+            new TextColorPair(this.transition.predicate, this.highlightColorText),
+            new TextColorPair("|", this.baseColorText),
+            new TextColorPair(this.transition.manipulationValue, this.highlightColorText),
+            new TextColorPair(",", this.baseColorText),
+            new TextColorPair(<string>this.transition.direction, this.baseColorText)
+        ], this.textPosition.x, this.textPosition.y);
     }
 
     interact(p: any, ctx: p5): void {
 
+    }
+
+    private colorText(text_array: TextColorPair[], x: number, y: number): void {
+        let pos_x: number = x - 30;
+
+        this.ctx.textFont("monospace");
+
+        for (let i = 0; i < text_array.length; ++i) {
+            let part: TextColorPair = text_array[i];
+            let t: string = part.text;
+            let c: any = part.color;
+            let w: number = (Math.ceil(t.length / 2)) * 20;
+            console.log(t.length);
+            this.ctx.fill(c.r, c.g, c.b);
+            this.ctx.text(t, pos_x, y);
+            pos_x += w;
+        }
+
+        this.ctx.textFont("sans-serif");
     }
 
     private linearTransformationLerp(lerpValue: number): p5.Vector {
