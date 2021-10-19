@@ -12,6 +12,8 @@ export default class StateDrawer implements IDrawer {
     private overLappingColor: any = { r: 255, g: 0, b: 0};
     private isMouseTargeted: boolean = false;
 
+    private static targetInstance: StateDrawer | null = null;
+
     constructor(private _state: State, private _position: p5.Vector) {
     }
 
@@ -51,22 +53,27 @@ export default class StateDrawer implements IDrawer {
     }
 
     interact(p: any, ctx: p5): void {
-        let mouseVector: p5.Vector = ctx.createVector(p.mouseX, p.mouseY);
-        if (p5.Vector.dist(this.position, mouseVector) < this.circleRadius) {
-            this.mouseOverlapping = true;
-        } else {
-            this.mouseOverlapping = false;
-        }
+        if (this == StateDrawer.targetInstance || StateDrawer.targetInstance == null) {
 
-        if (p.mouseIsPressed && (this.mouseOverlapping || this.isMouseTargeted)) {
-            this.isMouseTargeted = true;
-        } else {
-            this.isMouseTargeted = false;
-        }
+            let mouseVector: p5.Vector = ctx.createVector(p.mouseX, p.mouseY);
+            if ((p5.Vector.dist(this.position, mouseVector) < this.circleRadius)) {
+                this.mouseOverlapping = true;
+            } else {
+                this.mouseOverlapping = false;
+            }
 
-        if (this.isMouseTargeted && p.mouseButton === p.LEFT) {
-            this.position.x = p.mouseX;
-            this.position.y = p.mouseY;
+            if (p.mouseIsPressed && (this.mouseOverlapping || this.isMouseTargeted)) {
+                this.isMouseTargeted = true;
+                StateDrawer.targetInstance = this;
+            } else {
+                this.isMouseTargeted = false;
+                StateDrawer.targetInstance = null;
+            }
+
+            if (this.isMouseTargeted && p.mouseButton === p.LEFT) {
+                this.position.x = p.mouseX;
+                this.position.y = p.mouseY;
+            }
         }
     }
 }
