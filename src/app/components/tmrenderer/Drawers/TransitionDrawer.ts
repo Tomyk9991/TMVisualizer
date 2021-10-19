@@ -2,8 +2,10 @@ import Transition from "../../../../model/TM/Transition";
 import IDrawer from "./IDrawer";
 import * as p5 from "p5";
 import StateDrawer from "./StateDrawer";
+import {hexToRGB} from "../../../../utils/utilFunctions";
+import IRenderPipelineComponent from "./IRenderPipelineComponent";
 
-export default class TransitionDrawer implements IDrawer {
+export default class TransitionDrawer implements IDrawer, IRenderPipelineComponent {
     private static readonly radiusX: number = 10;
     private static readonly radiusY: number = 17;
     private static readonly initialOffset: number = 5;
@@ -12,79 +14,67 @@ export default class TransitionDrawer implements IDrawer {
     private static drawingColor: any = {r: 194, g: 24, b: 91};
     private static maxDiameter: number = 0;
 
-
-    private static readonly positions: p5.Vector[] = [];
+    private static positions: p5.Vector[] = [];
+    private static cleanUpPositions: boolean = false;
 
     private textPosition: p5.Vector;
+
 
     constructor(private transition: Transition, private currentStateDrawer: StateDrawer, private nextStateDrawer: StateDrawer, private ctx: p5) {
         if(TransitionDrawer.maxDiameter === 0) {
             TransitionDrawer.maxDiameter = Math.sqrt(ctx.width * ctx.width + ctx.height * ctx.height);
 
             TransitionDrawer.drawingColor = {r: 255, g: 102, b: 0};
-            TransitionDrawer.drawingColor = this.hexToRGB(getComputedStyle(document.documentElement).getPropertyValue("--primary").trim());
+            TransitionDrawer.drawingColor = hexToRGB(getComputedStyle(document.documentElement).getPropertyValue("--primary").trim());
         }
 
+        this.textPosition = ctx.createVector();
+    }
 
+    onStartFrame(): void {
+        TransitionDrawer.cleanUpPositions = false;
+    }
+
+    onFinishFrame(): void {
+        if(!TransitionDrawer.cleanUpPositions) {
+            TransitionDrawer.positions = [];
+            TransitionDrawer.cleanUpPositions = true;
+        }
+    }
+
+    private calculateTextPosition(): p5.Vector {
+        let textPosition: p5.Vector;
         if (this.transition.currentState === this.transition.nextState) {
-            this.textPosition = ctx.createVector(
+            textPosition = this.ctx.createVector(
                 this.currentStateDrawer.position.x,
                 this.currentStateDrawer.position.y - this.currentStateDrawer.circleRadius - (TransitionDrawer.radiusY * 2)
             );
         } else {
             let textPos = this.linearTransformationLerp(0.5);
 
-
-            this.textPosition = ctx.createVector(
+            textPosition = this.ctx.createVector(
                 textPos.x,
                 textPos.y
             );
         }
 
         while (true) {
-            let contains: boolean = TransitionDrawer.positions.filter(vec => p5.Vector.dist(vec, this.textPosition) <= 3).length > 0;
+            let contains: boolean = TransitionDrawer.positions.filter(vec => p5.Vector.dist(vec, textPosition) <= 3).length > 0;
 
             if (contains) {
-                this.textPosition.y -= 25;
+                textPosition.y -= 25;
             } else {
-                TransitionDrawer.positions.push(this.textPosition);
+                TransitionDrawer.positions.push(textPosition);
                 break;
             }
         }
-    }
 
-    private hexToRGB(hex: string): any {
-        let shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-            return r + r + g + g + b + b;
-        });
-
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : null;
-    }
-
-    private linearTransformationLerp(lerpValue: number): p5.Vector {
-        let direction: p5.Vector = p5.Vector.sub(this.nextStateDrawer.position, this.currentStateDrawer.position);
-
-        let start: p5.Vector = p5.Vector.add(this.currentStateDrawer.position, direction.setMag(this.currentStateDrawer.circleRadius));
-        let end: p5.Vector = p5.Vector.add(this.nextStateDrawer.position, direction.mult(-1).setMag(this.nextStateDrawer.circleRadius));
-
-        let dist: number = p5.Vector.dist(start, end);
-        let amplitude: number = this.ctx.map(dist, 0, TransitionDrawer.maxDiameter, 0, TransitionDrawer.localMin);
-
-        let dirNor: p5.Vector = direction.normalize();
-
-        let position: p5.Vector = p5.Vector.lerp(start, end, lerpValue);
-        position.y -= this.ctx.lerp(0, amplitude, dirNor.x);
-        position.x += this.ctx.lerp(0, amplitude, dirNor.y);
-        return position;
+        return textPosition;
     }
 
     public draw(p: any, ctx: p5): void {
+        this.textPosition = this.calculateTextPosition();
+
         if (this.transition.currentState === this.transition.nextState) {
             p.strokeWeight(0);
 
@@ -148,6 +138,27 @@ export default class TransitionDrawer implements IDrawer {
         p.fill(255);
         p.strokeWeight(0.01);
         p.text(this.transition.predicate + "|" + this.transition.manipulationValue + ", " + <string>this.transition.direction, this.textPosition.x, this.textPosition.y);
+    }
+
+    interact(p: any, ctx: p5): void {
+
+    }
+
+    private linearTransformationLerp(lerpValue: number): p5.Vector {
+        let direction: p5.Vector = p5.Vector.sub(this.nextStateDrawer.position, this.currentStateDrawer.position);
+
+        let start: p5.Vector = p5.Vector.add(this.currentStateDrawer.position, direction.setMag(this.currentStateDrawer.circleRadius));
+        let end: p5.Vector = p5.Vector.add(this.nextStateDrawer.position, direction.mult(-1).setMag(this.nextStateDrawer.circleRadius));
+
+        let dist: number = p5.Vector.dist(start, end);
+        let amplitude: number = this.ctx.map(dist, 0, TransitionDrawer.maxDiameter, 0, TransitionDrawer.localMin);
+
+        let dirNor: p5.Vector = direction.normalize();
+
+        let position: p5.Vector = p5.Vector.lerp(start, end, lerpValue);
+        position.y -= this.ctx.lerp(0, amplitude, dirNor.x);
+        position.x += this.ctx.lerp(0, amplitude, dirNor.y);
+        return position;
     }
 
     private drawTriangleEnd(p: any, ctx: p5, start: any, end: any, vertexRadius: number) {

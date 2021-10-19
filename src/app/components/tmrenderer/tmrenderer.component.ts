@@ -7,6 +7,7 @@ import TransitionDrawer from "./Drawers/TransitionDrawer";
 import IDrawer from "./Drawers/IDrawer";
 import Transition from "../../../model/TM/Transition";
 import State from "../../../model/TM/State";
+import IRenderPipelineComponent from "./Drawers/IRenderPipelineComponent";
 
 @Component({
     selector: 'app-tmrenderer',
@@ -79,6 +80,7 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
 
                 transitionsDrawers.push(transitionDrawer);
                 drawQueue.push(transitionDrawer);
+                rpcs.push(transitionDrawer);
         };
             }
         p.draw = () => {
@@ -92,11 +94,21 @@ let stateDrawers: StateDrawer[] = [];
 let transitionsDrawers: TransitionDrawer[] = [];
 
 let drawQueue: IDrawer[] = [];
+let rpcs: IRenderPipelineComponent[] = [];
 
 function draw(p: any): void {
     p.background('#303030');
 
+    for (let i = 0; i < rpcs.length; i++) {
+        rpcs[i].onStartFrame();
+    }
+
     for (let i = 0; i < drawQueue.length; i++) {
+        drawQueue[i].interact(p, <p5>TMRendererComponent.p5);
         drawQueue[i].draw(p, <p5>TMRendererComponent.p5);
+    }
+
+    for (let i = 0; i < rpcs.length; i++) {
+        rpcs[i].onFinishFrame();
     }
 }
