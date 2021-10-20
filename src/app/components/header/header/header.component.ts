@@ -10,7 +10,7 @@ import TuringMachine from "../../../../model/TM/TuringMachine";
 })
 export class HeaderComponent implements OnInit {
 
-    constructor(private renderer: TMRendererService) {
+    constructor(private tmRendererService: TMRendererService) {
 
     }
 
@@ -85,7 +85,7 @@ export class HeaderComponent implements OnInit {
             "acc_states = \tq_e";
 
         let tm: TuringMachine = constructFromString(target);
-        this.renderer.render(tm);
+        this.tmRendererService.render(tm);
     }
 
     public fileHandleChanged(event: any): void {

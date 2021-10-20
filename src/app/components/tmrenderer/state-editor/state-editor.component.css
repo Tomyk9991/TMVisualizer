@@ -1,0 +1,41 @@
+.topRight {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    width: 33%;
+    margin-right: 40px;
+
+    animation-name: slideLeft;
+    animation-duration: 0.15s;
+}
+
+@keyframes slideLeft {
+    from {
+        right: -33%;
+    }
+    to {
+        right: 0px;
+    }
+}
+
+.inputField {
+    max-width: 30%;
+    margin-top: 3px;
+    margin-bottom: -15px;
+}
+
+.closeButton {
+    position: fixed;
+    top: 0.5%;
+    right: 0.5%;
+    height: 100%;
+}
+
+.closeTransitionButton {
+    position: absolute;
+    right: 0;
+}
+
+.card {
+    width: 100%;
+}

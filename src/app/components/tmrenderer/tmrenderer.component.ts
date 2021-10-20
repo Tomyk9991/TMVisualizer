@@ -9,6 +9,7 @@ import RenderPipelineManager from "./Drawers/managers/RenderPipelineManager";
 import DrawerManager from "./Drawers/managers/DrawerManager";
 import InteractableManager from "./Drawers/managers/InteractableManager";
 import KeyboardCallbackManager from "./Drawers/managers/KeyboardCallbackManager";
+import StateEditorService from "../../services/state-editor.service";
 
 @Component({
     selector: 'app-tmrenderer',
@@ -19,15 +20,21 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
     private p5?: p5;
 
     static p5?: p5;
+    static p: any;
     static screenHeight: number = 0;
     static screenWidth: number = 0;
     static TM?: TuringMachine;
+    static stateEditorService: StateEditorService;
 
-    constructor(private renderer: TMRendererService) {
+    constructor(stateEditorService: StateEditorService, private rendererNotifier: TMRendererService) {
         this.getScreenSize();
-        this.renderer.OnRegisterRender.on((data: TuringMachine) => {
+        this.rendererNotifier.OnRegisterRender.on((data: TuringMachine) => {
             TMRendererComponent.TM = data;
-        })
+            if (TMRendererComponent.p !== undefined) {
+                resetSketch(TMRendererComponent.p, false);
+            }
+        });
+        TMRendererComponent.stateEditorService = stateEditorService;
     }
 
 
@@ -52,37 +59,8 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
     private sketch(p: any) {
         p.setup = () => {
             p.createCanvas(TMRendererComponent.screenWidth, TMRendererComponent.screenHeight);
-            p.ellipseMode(p.CENTER);
-            p.textAlign(p.CENTER, p.CENTER);
-
-            let tm: TuringMachine = <TuringMachine>TMRendererComponent.TM;
-
-            console.log(tm);
-
-            new TextDescriptionDrawer(); // putting it in the constructor
-
-
-            for (let i = 0; i < tm.states.length; i++) {
-                // let x: number = <number>TMRendererComponent.p5?.random(50, TMRendererComponent.screenWidth - 50);
-                // let y: number = <number>TMRendererComponent.p5?.random(50,  TMRendererComponent.screenHeight - 50);
-                let margin: number = 60;
-                let x: number = <number>TMRendererComponent.p5?.map(i, 0, tm.states.length - 1, margin, TMRendererComponent.screenWidth - margin);
-                let y: number = TMRendererComponent.screenHeight / 2;
-
-                let pos: p5.Vector = <p5.Vector>TMRendererComponent.p5?.createVector(x, y);
-
-                let stateDrawer: StateDrawer = new StateDrawer(tm.states[i], pos);
-                stateDrawers.push(stateDrawer);
-            }
-
-            for (let i = 0; i < tm.transitions.length; i++) {
-                let currentStateDrawer: StateDrawer = <StateDrawer>stateDrawers.find((drawer: StateDrawer) => drawer.state === tm.transitions[i].currentState);
-                let nextStateDrawer: StateDrawer = <StateDrawer>stateDrawers.find((drawer: StateDrawer) => drawer.state === tm.transitions[i].nextState);
-
-                let transitionDrawer: TransitionDrawer = new TransitionDrawer(tm.transitions[i], currentStateDrawer, nextStateDrawer, <p5>TMRendererComponent.p5);
-
-                transitionsDrawers.push(transitionDrawer);
-            }
+            TMRendererComponent.p = p;
+            resetSketch(p, true);
         };
         p.draw = () => {
             draw(p);
@@ -99,6 +77,58 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
 // TM
 let stateDrawers: StateDrawer[] = [];
 let transitionsDrawers: TransitionDrawer[] = [];
+
+let statePositions: p5.Vector[] = [];
+
+function resetSketch(p: any, resetPositions: boolean): void {
+    //reset systems
+    RenderPipelineManager.rpcs = [];
+    InteractableManager.interactables = [];
+    DrawerManager.drawQueue = [];
+    KeyboardCallbackManager.callbacks = [];
+
+    let stateDrawers: StateDrawer[] = [];
+    let transitionsDrawers: TransitionDrawer[] = [];
+
+
+    p.ellipseMode(p.CENTER);
+    p.textAlign(p.CENTER, p.CENTER);
+
+    let tm: TuringMachine = <TuringMachine>TMRendererComponent.TM;
+
+    new TextDescriptionDrawer(); // putting it in the constructor
+
+    if (resetPositions) {
+        statePositions = [];
+    }
+
+    for (let i = 0; i < tm.states.length; i++) {
+        // let x: number = <number>TMRendererComponent.p5?.random(50, TMRendererComponent.screenWidth - 50);
+        // let y: number = <number>TMRendererComponent.p5?.random(50,  TMRendererComponent.screenHeight - 50);
+        let margin: number = 60;
+        let x: number = <number>TMRendererComponent.p5?.map(i, 0, tm.states.length - 1, margin, TMRendererComponent.screenWidth - margin);
+        let y: number = TMRendererComponent.screenHeight / 2;
+
+        if (resetPositions) {
+            statePositions.push(<p5.Vector>TMRendererComponent.p5?.createVector(x, y));
+        }
+
+
+        let pos: p5.Vector = statePositions[i];
+
+        let stateDrawer: StateDrawer = new StateDrawer(TMRendererComponent.stateEditorService, tm, tm.states[i], pos);
+        stateDrawers.push(stateDrawer);
+    }
+
+
+    for (let i = 0; i < tm.transitions.length; i++) {
+        let currentStateDrawer: StateDrawer = <StateDrawer>stateDrawers.find((drawer: StateDrawer) => drawer.state == tm.transitions[i].currentState);
+        let nextStateDrawer: StateDrawer = <StateDrawer>stateDrawers.find((drawer: StateDrawer) => drawer.state == tm.transitions[i].nextState);
+
+        let transitionDrawer: TransitionDrawer = new TransitionDrawer(tm.transitions[i], currentStateDrawer, nextStateDrawer, <p5>TMRendererComponent.p5);
+        transitionsDrawers.push(transitionDrawer);
+    }
+}
 
 function draw(p: any): void {
     p.background('#303030');

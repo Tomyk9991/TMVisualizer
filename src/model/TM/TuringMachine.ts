@@ -18,6 +18,10 @@ export default class TuringMachine {
         return this._tape_alphabet;
     }
 
+    public setTransitions(t:Transition[]): void  {
+        this._transitions = t;
+    }
+
     get transitions(): Transition[] {
         return this._transitions;
     }

@@ -6,6 +6,8 @@ import IInteractable from "./IInteractable";
 import InteractableManager from "./managers/InteractableManager";
 import IKeyboardCallback from "./IKeyboardCallback";
 import KeyboardCallbackManager from "./managers/KeyboardCallbackManager";
+import StateEditorService from "../../../services/state-editor.service";
+import TuringMachine from "../../../../model/TM/TuringMachine";
 
 export default class StateDrawer implements IDrawer, IInteractable, IKeyboardCallback {
     private static readonly minFontSize: number = 4;
@@ -19,7 +21,7 @@ export default class StateDrawer implements IDrawer, IInteractable, IKeyboardCal
 
     private static targetInstance: StateDrawer | null = null;
 
-    constructor(private _state: State, private _position: p5.Vector) {
+    constructor(private stateEditorService: StateEditorService, private turingMachine: TuringMachine, private _state: State, private _position: p5.Vector) {
         DrawerManager.drawQueue.push(this);
         InteractableManager.interactables.push(this);
         KeyboardCallbackManager.callbacks.push(this);
@@ -86,7 +88,8 @@ export default class StateDrawer implements IDrawer, IInteractable, IKeyboardCal
     }
 
     keyPressed(ctx: p5, key: string): void {
-        if (this.mouseOverlapping && key == ' ') {
+        if (ctx.focused && this.mouseOverlapping && key == ' ') {
+            this.stateEditorService.render(this.state, this.turingMachine);
         }
     }
 }

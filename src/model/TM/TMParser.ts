@@ -73,7 +73,9 @@ function filterForTapeAlphabet(lines: string[]): string[] {
         if (line.includes("->")) {
             line = line.trim();
             let tapeLetter: string = line.split("->")[0].split(',')[1].trim();
+            let tapeLetter2: string = line.split("->")[1].split(',')[1].trim();
             tapeAlphabet.add(tapeLetter);
+            tapeAlphabet.add(tapeLetter2);
         }
     }
 
