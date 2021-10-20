@@ -18,6 +18,14 @@
     }
 }
 
+.addButton {
+    display: flex;
+    justify-content: flex-end;
+    width: 40px;
+    margin-top: 15px;
+    width: 100%;
+}
+
 .inputField {
     max-width: 30%;
     margin-top: 3px;
@@ -31,7 +39,7 @@
     height: 100%;
 }
 
-.closeTransitionButton {
+.removeTransitionButton {
     position: absolute;
     right: 0;
 }

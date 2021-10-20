@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { StateComponent } from './state.component';
+import { TransitionEntryComponent } from './transition-entry.component';
 
 describe('StateComponent', () => {
-  let component: StateComponent;
-  let fixture: ComponentFixture<StateComponent>;
+  let component: TransitionEntryComponent;
+  let fixture: ComponentFixture<TransitionEntryComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ StateComponent ]
+      declarations: [ TransitionEntryComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(StateComponent);
+    fixture = TestBed.createComponent(TransitionEntryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

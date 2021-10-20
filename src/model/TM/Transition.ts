@@ -9,35 +9,24 @@ export enum TMDirection {
 }
 
 export default class Transition {
-    private _direction: TMDirection = TMDirection.NotInitialized;
+    public direction: TMDirection = TMDirection.NotInitialized;
 
-    constructor(private _currentState: State, private _predicate: string, private _nextState: State, private _manipulationValue: string, direction: string) {
-        if (direction === "L") { this._direction = TMDirection.Left; }
-        else if (direction === "R") { this._direction = TMDirection.Right; }
-        else if (direction === "N") { this._direction = TMDirection.Noop; }
-    }
-    
-    get direction(): TMDirection {
-        return this._direction;
+    constructor(public currentState: State, public predicate: string, public nextState: State, public manipulationValue: string, direction: string) {
+        this.direction = Transition.stringToTMDirection(direction);
     }
 
-    get currentState(): State {
-        return this._currentState;
-    }
+    public static stringToTMDirection(value: string): TMDirection {
+        value = value.toLowerCase();
+        if (value === "l") { return TMDirection.Left; }
+        else if (value === "r") { return TMDirection.Right; }
+        else if (value === "n") { return TMDirection.Noop; }
 
-    get predicate(): string {
-        return this._predicate;
-    }
-
-    get nextState(): State {
-        return this._nextState;
-    }
-
-    get manipulationValue(): string {
-        return this._manipulationValue;
+        return TMDirection.NotInitialized;
     }
 }
 
+
+// TODO Make Initial position work in state editor and drawer
 export class InitialTransition extends Transition {
 
 }

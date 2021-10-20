@@ -4,7 +4,7 @@
         <mat-card-title>{{this.state?.Name}}</mat-card-title>
 
         <div class="closeButton">
-            <button mat-icon-button color="primary" (click)="this.state = undefined">
+            <button mat-icon-button color="primary" (click)="onClose()">
                 <mat-icon>close</mat-icon>
             </button>
         </div>
@@ -12,7 +12,7 @@
         <mat-divider></mat-divider>
 
         <div *ngFor="let values of [].constructor(this.numTransitions); let i = index">
-            <div class="closeTransitionButton">
+            <div class="removeTransitionButton">
                 <button type="button" mat-icon-button color="primary" (click)="this.deleteTransition(i)">
                     <mat-icon>delete</mat-icon>
                 </button>
@@ -20,12 +20,22 @@
 
             <form>
                 <span *ngFor="let num of [0,1,2,3]" >
-                    <app-state [title]="labels[num]" [formControl]="formHelpers[i][num].formControl" [options]="formHelpers[i][num].filteredOptions!!"></app-state>
+                    <app-transitionEntry
+                        [title]="labels[num]"
+                        [control]="formHelpers[i][num].formControl"
+                        [options]="formHelpers[i][num].filteredOptions!!"></app-transitionEntry>
                     <mat-icon *ngIf="num == 0">arrow_forward</mat-icon>
                     <mat-label style="font-size: 30px" *ngIf="num > 0 && num < 3"> , </mat-label>
                     <mat-divider></mat-divider>
                 </span>
             </form>
         </div>
+
+        <div class="addButton">
+            <button mat-mini-fab color="primary" (click)="this.addTransition()">
+                <mat-icon>queue</mat-icon>
+            </button>
+        </div>
+
     </mat-card>
 </div>

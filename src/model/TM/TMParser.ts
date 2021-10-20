@@ -24,7 +24,7 @@ export default function constructFromString(target: string): TuringMachine {
 
     // console.log("Input alphabet: ", input_alphabet);
     // console.log("Tape alphabet: ", tape_alphabet);
-    // console.log("Start state: ", start_state);
+    // console.log("Start transitionentry: ", start_state);
     // console.log("Final states: ", acc_states);
     // console.log("States: ", states);
     // console.log("Transitions: ", transitions);

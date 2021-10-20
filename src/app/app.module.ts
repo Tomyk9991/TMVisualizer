@@ -18,7 +18,7 @@ import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatOptionModule} from "@angular/material/core";
 import {ReactiveFormsModule} from "@angular/forms";
 import {MatInputModule} from "@angular/material/input";
-import { StateComponent } from './components/tmrenderer/state/state.component';
+import { TransitionEntryComponent } from './components/tmrenderer/transitionentry/transition-entry.component';
 
 
 @NgModule({
@@ -27,7 +27,7 @@ import { StateComponent } from './components/tmrenderer/state/state.component';
         HeaderComponent,
         TMRendererComponent,
         StateEditorComponent,
-        StateComponent
+        TransitionEntryComponent
     ],
     imports: [
         BrowserModule,

@@ -21,7 +21,7 @@ export class StateEditorComponent implements OnInit {
 
     public numTransitions: number = 0;
     public formHelpers: AutoCompleteHelper[][] = [];
-    public readonly labels = [
+    public readonly labels: string[] = [
         "Predicate",
         "Next state",
         "Manipulation value",
@@ -48,24 +48,29 @@ export class StateEditorComponent implements OnInit {
         let directions: string[] = ["L", "R", "N"];
 
         this.formHelpers = [];
+
+        if (AutoCompleteHelper.tmRenderService === undefined) {
+            AutoCompleteHelper.tmRenderService = this.tmRenderNotifier;
+        }
+        if(AutoCompleteHelper.TM === undefined) {
+            AutoCompleteHelper.TM = <TuringMachine> this.turingMachine;
+        }
+
         for (let i = 0; i < this.numTransitions; i++) {
             this.formHelpers[i] = [];
             // predicate
-            this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), tape_alphabet, transitions[i].predicate));
+            this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), tape_alphabet, transitions[i].predicate, TransitionPart.Predicate, transitions[i]));
             //next state
-            this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), allStates, transitions[i].nextState.Name));
+            this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), allStates, transitions[i].nextState.Name, TransitionPart.NextState, transitions[i]));
             // manipulation value
-            this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), tape_alphabet, transitions[i].manipulationValue));
+            this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), tape_alphabet, transitions[i].manipulationValue, TransitionPart.ManipulationValue, transitions[i]));
             // direction
-            this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), directions, <string>transitions[i].direction));
-        }
+            this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), directions, <string>transitions[i].direction, TransitionPart.Direction, transitions[i]));
 
-
-        for (let i = 0; i < this.formHelpers.length; i++) {
             for (let j = 0; j < 4; j++) {
                 this.formHelpers[i][j].filteredOptions = this.formHelpers[i][j].formControl.valueChanges.pipe(
                     startWith(''),
-                    map(value => this.formHelpers[i][j].filter(value))
+                    map(value => this.formHelpers[i][j].filter(value)),
                 );
             }
         }
@@ -73,6 +78,18 @@ export class StateEditorComponent implements OnInit {
 
     ngOnInit(): void {
         this.updateAutoCompleteHelpers();
+    }
+
+    public onClose() {
+        this.state = undefined;
+    }
+
+    public addTransition(): void {
+        let transition: Transition = new Transition(<State>this.state, "~", <State>this.state, "~", "L");
+        (<TuringMachine>this.turingMachine).transitions.push(transition);
+
+        this.updateAutoCompleteHelpers();
+        this.tmRenderNotifier.render(<TuringMachine>this.turingMachine);
     }
 
     public deleteTransition(i: number): void {
@@ -86,19 +103,54 @@ export class StateEditorComponent implements OnInit {
             this.updateAutoCompleteHelpers();
             this.tmRenderNotifier.render(<TuringMachine>this.turingMachine);
         }
-
     }
 }
 
 
 class AutoCompleteHelper {
     public filteredOptions?: Observable<string[]>;
-    constructor(public formControl: FormControl, public values: string[], public def: string) {
+    public static tmRenderService: TMRendererService;
+    public static TM: TuringMachine;
+
+    constructor(public formControl: FormControl, public values: string[], public def: string, private transitionPart: TransitionPart, private transition: Transition) {
         formControl.setValue(def);
     }
 
     public filter(value: string): string[] {
         const filterValue: string = value.toLowerCase();
-        return this.values.filter(option => option.toLowerCase().includes(filterValue));
+        let result: string[] = this.values.filter(option => option.toLowerCase() === filterValue);
+
+        if (result.length == 1)
+        {
+            if (this.transitionPart === TransitionPart.Predicate)
+            {
+                this.transition.predicate = result[0];
+                AutoCompleteHelper.tmRenderService.render(AutoCompleteHelper.TM);
+            }
+            else if (this.transitionPart === TransitionPart.NextState)
+            {
+                this.transition.nextState = AutoCompleteHelper.TM.states.filter(s => s.Name === result[0])[0];
+                AutoCompleteHelper.tmRenderService.render(AutoCompleteHelper.TM);
+            }
+            else if (this.transitionPart === TransitionPart.ManipulationValue)
+            {
+                this.transition.manipulationValue = result[0];
+                AutoCompleteHelper.tmRenderService.render(AutoCompleteHelper.TM);
+            }
+            else if (this.transitionPart === TransitionPart.Direction)
+            {
+                this.transition.direction = Transition.stringToTMDirection(result[0]);
+                AutoCompleteHelper.tmRenderService.render(AutoCompleteHelper.TM);
+            }
+        }
+
+        return result;
     }
+}
+
+enum TransitionPart {
+    Predicate,
+    NextState,
+    ManipulationValue,
+    Direction
 }

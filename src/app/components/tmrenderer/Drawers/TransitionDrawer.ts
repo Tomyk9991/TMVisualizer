@@ -209,7 +209,7 @@ export default class TransitionDrawer implements IDrawer, IRenderPipelineCompone
         let offset = vertexRadius;
 
         p.stroke(TransitionDrawer.drawingColor.r, TransitionDrawer.drawingColor.g, TransitionDrawer.drawingColor.b);
-        p.push() //start new drawing state
+        p.push() //start new drawing transitionentry
 
         p.fill(TransitionDrawer.drawingColor.r, TransitionDrawer.drawingColor.g, TransitionDrawer.drawingColor.b);
         let angle: number = Math.atan2(start.y - end.y, start.x - end.x);
