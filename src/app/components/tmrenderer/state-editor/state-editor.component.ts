@@ -21,6 +21,12 @@ export class StateEditorComponent implements OnInit {
 
     public numTransitions: number = 0;
     public formHelpers: AutoCompleteHelper[][] = [];
+    public readonly labels = [
+        "Predicate",
+        "Next state",
+        "Manipulation value",
+        "Direction"
+    ];
 
     constructor(private rendererNotifier: StateEditorService, private tmRenderNotifier: TMRendererService) {
         this.rendererNotifier.OnRegisterRender.on((data: StateTransitionEditorPair) => {

@@ -19,73 +19,12 @@
             </div>
 
             <form>
-                <!--            Predicate-->
-                <mat-form-field class="inputField" appearance="outline">
-                    <mat-label>Predicate</mat-label>
-                    <input type="text"
-                           placeholder="Pick one"
-                           matInput
-                           [formControl]="formHelpers[i][0].formControl"
-                           [matAutocomplete]="auto1">
-                    <mat-autocomplete autoActiveFirstOption #auto1="matAutocomplete">
-                        <mat-option *ngFor="let option of formHelpers[i][0].filteredOptions | async" [value]="option">
-                            {{option}}
-                        </mat-option>
-                    </mat-autocomplete>
-                </mat-form-field>
-
-                <mat-icon>arrow_forward</mat-icon>
-
-                <!--Next state-->
-                <mat-form-field class="inputField" style="max-width: 15%" appearance="outline">
-                    <mat-label>Next state</mat-label>
-                    <input type="text"
-                           placeholder="Pick one"
-                           matInput
-                           [formControl]="formHelpers[i][1].formControl"
-                           [matAutocomplete]="auto2">
-                    <mat-autocomplete autoActiveFirstOption #auto2="matAutocomplete">
-                        <mat-option *ngFor="let option of formHelpers[i][1].filteredOptions | async" [value]="option">
-                            {{option}}
-                        </mat-option>
-                    </mat-autocomplete>
-                </mat-form-field>
-
-                <mat-label style="font-size: 30px"> , </mat-label>
-
-                <!--            Manipulation value-->
-                <mat-form-field class="inputField" style="max-width: 18%" appearance="outline">
-                    <mat-label>Manipulation value</mat-label>
-                    <input type="text"
-                           placeholder="Pick one"
-                           matInput
-                           [formControl]="formHelpers[i][2].formControl"
-                           [matAutocomplete]="auto3">
-                    <mat-autocomplete autoActiveFirstOption #auto3="matAutocomplete">
-                        <mat-option *ngFor="let option of formHelpers[i][2].filteredOptions | async" [value]="option">
-                            {{option}}
-                        </mat-option>
-                    </mat-autocomplete>
-                </mat-form-field>
-
-                <mat-label style="font-size: 30px"> , </mat-label>
-
-                <!--            Direction-->
-                <mat-form-field class="inputField" style="max-width: 15%" appearance="outline">
-                    <mat-label>Direction</mat-label>
-                    <input type="text"
-                           placeholder="Pick one"
-                           matInput
-                           [formControl]="formHelpers[i][3].formControl"
-                           [matAutocomplete]="auto4">
-
-                    <mat-autocomplete autoActiveFirstOption #auto4="matAutocomplete">
-                        <mat-option *ngFor="let option of formHelpers[i][3].filteredOptions | async" [value]="option">
-                            {{option}}
-                        </mat-option>
-                    </mat-autocomplete>
-                </mat-form-field>
-                <mat-divider></mat-divider>
+                <span *ngFor="let num of [0,1,2,3]" >
+                    <app-state [title]="labels[num]" [formControl]="formHelpers[i][num].formControl" [options]="formHelpers[i][num].filteredOptions!!"></app-state>
+                    <mat-icon *ngIf="num == 0">arrow_forward</mat-icon>
+                    <mat-label style="font-size: 30px" *ngIf="num > 0 && num < 3"> , </mat-label>
+                    <mat-divider></mat-divider>
+                </span>
             </form>
         </div>
     </mat-card>
