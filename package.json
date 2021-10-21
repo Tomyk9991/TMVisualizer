@@ -4,7 +4,7 @@
     "scripts": {
         "ng": "ng",
         "start": "ng serve --watch",
-        "build": "ng build",
+        "build": "ng build --base-href=/TMVisualizer",
         "deploy": "ng deploy --base-href=/TMVisualizer",
         "watch": "ng build --watch --configuration development",
         "test": "ng test"
