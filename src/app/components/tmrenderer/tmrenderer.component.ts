@@ -40,8 +40,22 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
 
     @HostListener('window:resize', ['$event'])
     getScreenSize(event?: any) {
+        let previousWidth = TMRendererComponent.screenWidth;
+        let previousHeight = TMRendererComponent.screenHeight;
+
         TMRendererComponent.screenWidth = window.innerWidth - 15;
         TMRendererComponent.screenHeight = window.innerHeight - 70;
+
+        if (TMRendererComponent.p !== undefined) {
+            TMRendererComponent.p.resizeCanvas(TMRendererComponent.screenWidth, TMRendererComponent.screenHeight);
+            // recalculate position of states with new screen size
+            for (let i = 0; i < statePositions.length; i++) {
+                statePositions[i].x = (statePositions[i].x / previousWidth) * TMRendererComponent.screenWidth;
+                statePositions[i].y = (statePositions[i].y / previousHeight) * TMRendererComponent.screenHeight;
+            }
+            resetSketch(TMRendererComponent.p, false);
+        }
+
     }
 
     ngAfterViewInit(): void {
