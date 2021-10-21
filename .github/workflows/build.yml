@@ -29,5 +29,5 @@ jobs:
       env:
         REPO: self
         BRANCH: gh-pages
-        FOLDER: dist
+        FOLDER: dist/TMVisualizer
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   
