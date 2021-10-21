@@ -55,7 +55,6 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
             }
             resetSketch(TMRendererComponent.p, false);
         }
-
     }
 
     ngAfterViewInit(): void {
