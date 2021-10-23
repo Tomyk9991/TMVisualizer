@@ -19,7 +19,7 @@ export default class StateDrawer implements IDrawer, IInteractable, IKeyboardCal
     private overLappingColor: any = { r: 255, g: 0, b: 0};
     private isMouseTargeted: boolean = false;
 
-    private static targetInstance: StateDrawer | null = null;
+    public static targetInstance: StateDrawer | null = null;
 
     constructor(private stateEditorService: StateEditorService, private turingMachine: TuringMachine, private _state: State, private _position: p5.Vector) {
         DrawerManager.drawQueue.push(this);

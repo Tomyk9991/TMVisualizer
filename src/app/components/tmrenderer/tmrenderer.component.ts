@@ -10,6 +10,8 @@ import DrawerManager from "./Drawers/managers/DrawerManager";
 import InteractableManager from "./Drawers/managers/InteractableManager";
 import KeyboardCallbackManager from "./Drawers/managers/KeyboardCallbackManager";
 import StateEditorService from "../../services/state-editor.service";
+import CreateStateCreater from "./KeyboardCallbackInstances/CreateStateCreater";
+import RemoveStateRemover from "./KeyboardCallbackInstances/RemoveStateRemover";
 
 @Component({
     selector: 'app-tmrenderer',
@@ -25,10 +27,17 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
     static screenWidth: number = 0;
     static TM?: TuringMachine;
     static stateEditorService: StateEditorService;
+    static tmRendererService: TMRendererService;
 
     constructor(stateEditorService: StateEditorService, private rendererNotifier: TMRendererService) {
         this.getScreenSize();
+        TMRendererComponent.tmRendererService = rendererNotifier;
         this.rendererNotifier.OnRegisterRender.on((data: TuringMachine) => {
+            if (CreateStateCreater.statePosition !== undefined) {
+                statePositions.push(CreateStateCreater.statePosition);
+                CreateStateCreater.statePosition = undefined;
+            }
+
             TMRendererComponent.TM = data;
             if (TMRendererComponent.p !== undefined) {
                 resetSketch(TMRendererComponent.p, false);
@@ -93,6 +102,10 @@ let transitionsDrawers: TransitionDrawer[] = [];
 
 let statePositions: p5.Vector[] = [];
 
+export function removePosition(vec: p5.Vector): void {
+
+}
+
 function resetSketch(p: any, resetPositions: boolean): void {
     //reset systems
     RenderPipelineManager.rpcs = [];
@@ -108,8 +121,12 @@ function resetSketch(p: any, resetPositions: boolean): void {
     p.textAlign(p.CENTER, p.CENTER);
 
     let tm: TuringMachine = <TuringMachine>TMRendererComponent.TM;
+    let renderer: TMRendererService = TMRendererComponent.tmRendererService;
 
-    new TextDescriptionDrawer(); // putting it in the constructor
+    // Objects registered in manager singleton
+    new TextDescriptionDrawer();
+    new CreateStateCreater(tm, renderer);
+    new RemoveStateRemover(tm, renderer);
 
     if (resetPositions) {
         statePositions = [];
@@ -141,6 +158,7 @@ function resetSketch(p: any, resetPositions: boolean): void {
         let transitionDrawer: TransitionDrawer = new TransitionDrawer(tm.transitions[i], currentStateDrawer, nextStateDrawer, <p5>TMRendererComponent.p5);
         transitionsDrawers.push(transitionDrawer);
     }
+
 }
 
 function draw(p: any): void {
