@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { TransitionEntryComponent } from './transition-entry.component';
+import {TransitionEntryComponent} from './transition-entry.component';
 
 describe('StateComponent', () => {
   let component: TransitionEntryComponent;

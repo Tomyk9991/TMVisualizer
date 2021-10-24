@@ -5,8 +5,8 @@ import DrawerManager from "./managers/DrawerManager";
 export default class TextDescriptionDrawer implements IDrawer {
     private displayText: string =
         "Press 'space' on a state to edit it\n" +
-        "Press 'space' on an empty space to create a new state\n" +
-        "Press 'del' to a state to delete the state";
+        "Press 'c' on an empty space to create a new state\n" +
+        "Press 'r' to a state to delete the state";
 
     public constructor() {
         DrawerManager.drawQueue.push(this);

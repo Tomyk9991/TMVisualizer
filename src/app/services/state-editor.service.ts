@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import LiteEvent from "../../model/LiteEvent";
 import State from "../../model/TM/State";
-import Transition from "../../model/TM/Transition";
 import {StateTransitionEditorPair} from "./StateTransitionEditorPair";
 import TuringMachine from "../../model/TM/TuringMachine";
 

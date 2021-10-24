@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { StateEditorService } from './state-editor.service';
+import {StateEditorService} from './state-editor.service';
 
 describe('StateeditorService', () => {
   let service: StateEditorService;

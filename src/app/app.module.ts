@@ -11,14 +11,14 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {HeaderComponent} from './components/header/header/header.component';
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {TMRendererComponent} from './components/tmrenderer/tmrenderer.component';
-import { StateEditorComponent } from './components/tmrenderer/state-editor/state-editor.component';
+import {StateEditorComponent} from './components/tmrenderer/state-editor/state-editor.component';
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatSelectModule} from "@angular/material/select";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatOptionModule} from "@angular/material/core";
 import {ReactiveFormsModule} from "@angular/forms";
 import {MatInputModule} from "@angular/material/input";
-import { TransitionEntryComponent } from './components/tmrenderer/transitionentry/transition-entry.component';
+import {TransitionEntryComponent} from './components/tmrenderer/transitionentry/transition-entry.component';
 
 
 @NgModule({
