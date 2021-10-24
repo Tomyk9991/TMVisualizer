@@ -7,6 +7,7 @@ import TuringMachine from "../../../../model/TM/TuringMachine";
 import {TMRendererService} from "../../../services/t-m-renderer.service";
 import KeyboardCallbackManager from "../Drawers/managers/KeyboardCallbackManager";
 import {removePosition, TMRendererComponent} from "../tmrenderer.component";
+import {StateEditorComponent} from "../state-editor/state-editor.component";
 
 export default class RemoveStateRemover implements IKeyboardCallback {
     public constructor(private tm: TuringMachine, private renderer: TMRendererService) {
@@ -18,7 +19,8 @@ export default class RemoveStateRemover implements IKeyboardCallback {
     }
 
     keyPressed(ctx: p5, key: string): void {
-        if(key !== 'r') return;
+        if(key !== 'r'  || StateEditorComponent.hasState()) return;
+
         let mouseVector: p5.Vector = ctx.createVector(ctx.mouseX, ctx.mouseY);
         let stateDrawer: StateDrawer | undefined = undefined;
 
@@ -36,12 +38,11 @@ export default class RemoveStateRemover implements IKeyboardCallback {
         if (isMouseOnState) {
             let iState: StateDrawer = (<StateDrawer><unknown>stateDrawer);
 
-            console.log(this.tm.transitions);
-            this.tm.setTransitions(this.tm.transitions.filter(t => t.currentState != stateDrawer?.state && t.nextState != stateDrawer?.state));
-            console.log(this.tm.transitions);
 
-            // removePosition(iState.position);
-            //
+            this.tm.setTransitions(this.tm.transitions.filter(t => t.currentState != stateDrawer?.state && t.nextState != stateDrawer?.state));
+            removePosition(iState.position);
+            this.tm.states = this.tm.states.filter(state => state != iState.state);
+
             this.renderer.render(this.tm);
         }
     }

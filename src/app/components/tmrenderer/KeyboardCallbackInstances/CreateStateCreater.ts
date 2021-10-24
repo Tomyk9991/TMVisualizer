@@ -7,6 +7,7 @@ import IDrawer from "../Drawers/IDrawer";
 import TuringMachine from "../../../../model/TM/TuringMachine";
 import {TMRendererService} from "../../../services/t-m-renderer.service";
 import State from "../../../../model/TM/State";
+import {StateEditorComponent} from "../state-editor/state-editor.component";
 
 export default class CreateStateCreater implements IKeyboardCallback {
     public static statePosition: p5.Vector | undefined = undefined;
@@ -19,7 +20,7 @@ export default class CreateStateCreater implements IKeyboardCallback {
     }
 
     public keyPressed(ctx: p5, key: string): void {
-        if(key !== 'c') return;
+        if(key !== 'c' || StateEditorComponent.hasState()) return;
         let mouseVector: p5.Vector = ctx.createVector(ctx.mouseX, ctx.mouseY);
 
         let isMouseOnState: boolean = DrawerManager.drawQueue.some(d => {
@@ -43,6 +44,7 @@ export default class CreateStateCreater implements IKeyboardCallback {
 
             let state: State = new State(name);
             this.tm.states.push(state);
+
             this.renderer.render(this.tm);
         }
     }

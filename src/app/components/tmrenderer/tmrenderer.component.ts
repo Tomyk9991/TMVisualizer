@@ -90,7 +90,7 @@ export class TMRendererComponent implements OnInit, AfterViewInit {
 
         p.keyPressed = (event: any) => {
             for (let i = 0; i < KeyboardCallbackManager.callbacks.length; i++) {
-                KeyboardCallbackManager.callbacks[i].keyPressed(<p5>TMRendererComponent.p5, event.key);
+                KeyboardCallbackManager.callbacks[i].keyPressed(<p5>TMRendererComponent.p5, event.key.toLowerCase());
             }
         };
     }
@@ -103,7 +103,7 @@ let transitionsDrawers: TransitionDrawer[] = [];
 let statePositions: p5.Vector[] = [];
 
 export function removePosition(vec: p5.Vector): void {
-
+    statePositions = statePositions.filter(p => p !== vec);
 }
 
 function resetSketch(p: any, resetPositions: boolean): void {

@@ -19,6 +19,9 @@ export class StateEditorComponent implements OnInit {
     public state?: State;
     public turingMachine?: TuringMachine;
 
+    private static _hasState: boolean = false;
+    public static hasState(): boolean { return StateEditorComponent._hasState; }
+
     public numTransitions: number = 0;
     public formHelpers: AutoCompleteHelper[][] = [];
     public readonly labels: string[] = [
@@ -32,6 +35,7 @@ export class StateEditorComponent implements OnInit {
         this.rendererNotifier.OnRegisterRender.on((data: StateTransitionEditorPair) => {
             if (data.state != this.state) {
                 this.state = data.state;
+                StateEditorComponent._hasState = true;
                 this.turingMachine = data.transitions;
 
                 this.updateAutoCompleteHelpers();
@@ -81,6 +85,7 @@ export class StateEditorComponent implements OnInit {
     }
 
     public onClose() {
+        StateEditorComponent._hasState = false;
         this.state = undefined;
     }
 
