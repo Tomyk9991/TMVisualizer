@@ -1,6 +1,7 @@
-import State, {FinalState, InitialState} from "./State";
+import State from "./State";
 import Transition from "./Transition";
 import TuringMachine from "./TuringMachine";
+import {FileStructure} from "./FileStructure";
 
 export default function constructFromString(target: string): TuringMachine {
     let lines: string[] = target.split('\n');
@@ -8,8 +9,6 @@ export default function constructFromString(target: string): TuringMachine {
     lines = removeCompilerHintCharacters(lines);
     lines = removeLeadingEmptyLines(lines);
     // lines = removeSpaces(lines);
-
-
     // console.log(lines.join('\n'));
 
     let input_alphabet: string[] = filterFor('input_alphabet', lines);
@@ -29,7 +28,7 @@ export default function constructFromString(target: string): TuringMachine {
     // console.log("States: ", states);
     // console.log("Transitions: ", transitions);
 
-    return new TuringMachine(states, input_alphabet, tape_alphabet, transitions)
+    return new TuringMachine(states, input_alphabet, tape_alphabet, transitions);
 }
 
 function filterForTransitions(lines: string[], states: State[]): Transition[] {
@@ -106,9 +105,10 @@ function filterForStates(lines: string[], startState: string, acc_states: string
     }
 
     return Array.from(states.values()).map(value => {
-        return value === startState ? new InitialState(value)
-            : acc_states.includes(value) ? new FinalState(value)
-                : new State(value);
+        let isInitial: boolean = value === startState;
+        let isFinal: boolean = acc_states.includes(value);
+
+        return new State(value, isInitial, isFinal);
     });
 }
 
@@ -177,4 +177,98 @@ function removeSpaces(lines: string[]): string[] {
 
 function removeComments(lines: string[]): string[] {
     return lines.filter(value => !value.startsWith('#'));
+}
+
+export function getCompilerHintLines(sourceText: string): string[] {
+    let lines = sourceText.split('\n');
+
+    let a: string[] = [];
+    let includeLine: boolean = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        let line: string = lines[i];
+
+        if (line.includes("\"\"\"") && !line.trim().startsWith("#")) { // search for next """
+            if (line.trim() === "\"\"\"") {
+                includeLine = !includeLine;
+                if(!includeLine) { a.push(line); } // adding last closing """
+            } else {
+                let temp: string = line.trim();
+                let start = temp.indexOf("\"\"\"");
+                let end = temp.lastIndexOf("\"\"\"");
+                if (start != end) {
+                    a.push(line);
+                }
+            }
+        }
+
+        if (includeLine)
+        {
+            a.push(line);
+        }
+    }
+
+    return a;
+}
+
+export function getLineByLineStructure(sourceText: string): FileStructure[] {
+    let structure: FileStructure[] = [];
+    let lines = sourceText.split('\n');
+    let includeLine: boolean = false;
+    let transitionPositionLocalized: boolean = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        if (line.trim().startsWith('#')) {
+            structure.push(FileStructure.Comment);
+            continue;
+        }
+
+        if (line.includes("\"\"\"") && !line.trim().startsWith("#")) { // search for next """
+            if (line.trim() === "\"\"\"") {
+                includeLine = !includeLine;
+                if(!includeLine) { structure.push(FileStructure.CompilerHint); } // adding last closing """
+            } else {
+                let temp: string = line.trim();
+                let start = temp.indexOf("\"\"\"");
+                let end = temp.lastIndexOf("\"\"\"");
+                if (start != end) {
+                    structure.push(FileStructure.CompilerHint);
+                }
+            }
+        }
+
+        if (includeLine) {
+            structure.push(FileStructure.CompilerHint);
+            continue;
+        }
+
+
+        if (line.includes("transitions")) {
+            line = line.replace("transitions", " ".repeat(11)).replace("=", " ");
+        }
+
+        if (line.includes("->") && !transitionPositionLocalized) {
+            structure.push(FileStructure.Transitions);
+            transitionPositionLocalized = true;
+        }
+
+        if (line.includes("input_alphabet")) {
+            structure.push(FileStructure.InputAlphabet);
+        }
+
+        if (line.includes("start_state")) {
+            structure.push(FileStructure.StartState);
+        }
+
+        if (line.includes("acc_states")) {
+            structure.push(FileStructure.FinishingState);
+        }
+    }
+
+    return structure;
+}
+
+export function getCommentLines(sourceText: string): string[] {
+    return sourceText.split("\n").filter(value => value.trim().startsWith('#'));
 }

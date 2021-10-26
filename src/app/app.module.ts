@@ -19,6 +19,9 @@ import {MatOptionModule} from "@angular/material/core";
 import {ReactiveFormsModule} from "@angular/forms";
 import {MatInputModule} from "@angular/material/input";
 import {TransitionEntryComponent} from './components/tmrenderer/transitionentry/transition-entry.component';
+import { DownloadDialogComponent } from './components/header/download-dialog/download-dialog.component';
+import {MatDialogModule} from "@angular/material/dialog";
+import {MatCheckboxModule} from "@angular/material/checkbox";
 
 
 @NgModule({
@@ -27,7 +30,8 @@ import {TransitionEntryComponent} from './components/tmrenderer/transitionentry/
         HeaderComponent,
         TMRendererComponent,
         StateEditorComponent,
-        TransitionEntryComponent
+        TransitionEntryComponent,
+        DownloadDialogComponent
     ],
     imports: [
         BrowserModule,
@@ -44,6 +48,8 @@ import {TransitionEntryComponent} from './components/tmrenderer/transitionentry/
         MatAutocompleteModule,
         MatOptionModule,
         ReactiveFormsModule,
+        MatDialogModule,
+        MatCheckboxModule,
     ],
     providers: [],
     bootstrap: [AppComponent]

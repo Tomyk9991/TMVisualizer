@@ -9,6 +9,11 @@
             </button>
         </div>
 
+        <span>
+            <mat-checkbox [labelPosition]="this.lPos" color="primary" style="margin-right: 10px" [checked]="this.isInitialState()" (change)="this.onInitialStateChanged($event.checked)">Initial State?</mat-checkbox>
+            <mat-checkbox [labelPosition]="this.lPos" color="primary" [checked]="this.isFinalState()" (change)="this.onFinalStateChanged($event.checked)">Final State?</mat-checkbox>
+        </span>
+
         <mat-divider></mat-divider>
 
         <div *ngFor="let values of [].constructor(this.numTransitions); let i = index">

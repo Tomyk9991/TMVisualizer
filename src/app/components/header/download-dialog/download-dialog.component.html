@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Download file</h1>
+<div mat-dialog-content>
+    <p>Do you want to keep the file structure?</p>
+    <section>
+        <mat-checkbox [checked]="this.reuseStructure" (change)="this.onCheckBoxChanged($event.checked)">Keep structure</mat-checkbox>
+    </section>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="this.onCancelDialog()">Cancel</button>
+    <button mat-button [mat-dialog-close]="this.reuseStructure" cdkFocusInitial>Ok</button>
+</div>

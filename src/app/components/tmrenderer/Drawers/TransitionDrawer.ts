@@ -16,9 +16,9 @@ export default class TransitionDrawer implements IDrawer, IRenderPipelineCompone
     private static readonly radiusX: number = 10;
     private static readonly radiusY: number = 17;
     private static readonly initialOffset: number = 5;
-    private static readonly vertexRadius: number = 4;
+    public static readonly vertexRadius: number = 4;
     private static readonly localMin: number = 300;
-    private static drawingColor: any = {r: 194, g: 24, b: 91};
+    public static drawingColor: any = {r: 194, g: 24, b: 91};
     private static maxDiameter: number = 0;
 
     private static positions: p5.Vector[] = [];
@@ -132,7 +132,7 @@ export default class TransitionDrawer implements IDrawer, IRenderPipelineCompone
             p.curve(start.x, start.y, edgeRight.x, edgeRight.y, edgeLeft.x, edgeLeft.y, end.x, end.y);
             p.curve(edgeRight.x, edgeRight.y, edgeLeft.x, edgeLeft.y, end.x, end.y, end.x, end.y);
 
-            this.drawTriangleEnd(p, ctx, edgeLeft, end, TransitionDrawer.vertexRadius);
+            TransitionDrawer.drawTriangleEnd(p, ctx, edgeLeft, end, TransitionDrawer.vertexRadius);
         } else {
             let direction: p5.Vector = p5.Vector.sub(this.nextStateDrawer.position, this.currentStateDrawer.position);
             p.strokeWeight(8);
@@ -153,7 +153,7 @@ export default class TransitionDrawer implements IDrawer, IRenderPipelineCompone
             p.curve(start.x, start.y, edge1.x, edge1.y, edge2.x, edge2.y, end.x, end.y);
             p.curve(edge1.x, edge1.y, edge2.x, edge2.y, end.x, end.y, end.x, end.y);
 
-            this.drawTriangleEnd(p, ctx, edge2, end, TransitionDrawer.vertexRadius * 2);
+            TransitionDrawer.drawTriangleEnd(p, ctx, edge2, end, TransitionDrawer.vertexRadius * 2);
         }
 
 
@@ -205,7 +205,7 @@ export default class TransitionDrawer implements IDrawer, IRenderPipelineCompone
         return position;
     }
 
-    private drawTriangleEnd(p: any, ctx: p5, start: any, end: any, vertexRadius: number) {
+    public static drawTriangleEnd(p: any, ctx: p5, start: any, end: any, vertexRadius: number) {
         let offset = vertexRadius;
 
         p.stroke(TransitionDrawer.drawingColor.r, TransitionDrawer.drawingColor.g, TransitionDrawer.drawingColor.b);

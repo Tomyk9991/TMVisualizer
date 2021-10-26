@@ -1,14 +1,10 @@
-export default class State { // Zustand
-    constructor(private name: string) {
+export default class State {
+    public isInitialState: boolean = false;
+    public isFinalState: boolean = false;
+    constructor(private name: string, isInitial?: boolean, isFinal?: boolean) {
+        this.isInitialState = isInitial ?? false;
+        this.isFinalState = isFinal ?? false;
     }
 
     get Name() { return this.name; }
-}
-
-export class InitialState extends State {
-
-}
-
-export class FinalState extends State {
-
 }
