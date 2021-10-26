@@ -31,6 +31,8 @@ export class StateEditorComponent implements OnInit {
         "Direction"
     ];
 
+    public readonly lPos: 'before' | 'after' = 'before'
+
     constructor(private rendererNotifier: StateEditorService, private tmRenderNotifier: TMRendererService) {
         this.rendererNotifier.OnRegisterRender.on((data: StateTransitionEditorPair) => {
             if (data.state != this.state) {
@@ -82,6 +84,23 @@ export class StateEditorComponent implements OnInit {
 
     ngOnInit(): void {
         this.updateAutoCompleteHelpers();
+    }
+
+    public isInitialState(): boolean {
+        return this.state!.isInitialState;
+    }
+    public isFinalState(): boolean {
+        return this.state!.isFinalState;
+    }
+
+    public onInitialStateChanged(val: boolean): void {
+        this.state!.isInitialState = val;
+        this.tmRenderNotifier.render(<TuringMachine>this.turingMachine);
+    }
+
+    public onFinalStateChanged(val: boolean): void{
+        this.state!.isFinalState = val;
+        this.tmRenderNotifier.render(<TuringMachine>this.turingMachine);
     }
 
     public onClose() {

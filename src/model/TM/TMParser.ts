@@ -1,4 +1,4 @@
-import State, {FinalState, InitialState} from "./State";
+import State from "./State";
 import Transition from "./Transition";
 import TuringMachine from "./TuringMachine";
 import {FileStructure} from "./FileStructure";
@@ -28,7 +28,7 @@ export default function constructFromString(target: string): TuringMachine {
     // console.log("States: ", states);
     // console.log("Transitions: ", transitions);
 
-    return new TuringMachine(states, input_alphabet, tape_alphabet, transitions)
+    return new TuringMachine(states, input_alphabet, tape_alphabet, transitions);
 }
 
 function filterForTransitions(lines: string[], states: State[]): Transition[] {
@@ -105,9 +105,10 @@ function filterForStates(lines: string[], startState: string, acc_states: string
     }
 
     return Array.from(states.values()).map(value => {
-        return value === startState ? new InitialState(value)
-            : acc_states.includes(value) ? new FinalState(value)
-                : new State(value);
+        let isInitial: boolean = value === startState;
+        let isFinal: boolean = acc_states.includes(value);
+
+        return new State(value, isInitial, isFinal);
     });
 }
 
@@ -220,12 +221,13 @@ export function getLineByLineStructure(sourceText: string): FileStructure[] {
         let line = lines[i];
         if (line.trim().startsWith('#')) {
             structure.push(FileStructure.Comment);
+            continue;
         }
 
         if (line.includes("\"\"\"") && !line.trim().startsWith("#")) { // search for next """
             if (line.trim() === "\"\"\"") {
                 includeLine = !includeLine;
-                structure.push(FileStructure.CompilerHint);
+                if(!includeLine) { structure.push(FileStructure.CompilerHint); } // adding last closing """
             } else {
                 let temp: string = line.trim();
                 let start = temp.indexOf("\"\"\"");
@@ -234,6 +236,11 @@ export function getLineByLineStructure(sourceText: string): FileStructure[] {
                     structure.push(FileStructure.CompilerHint);
                 }
             }
+        }
+
+        if (includeLine) {
+            structure.push(FileStructure.CompilerHint);
+            continue;
         }
 
 
