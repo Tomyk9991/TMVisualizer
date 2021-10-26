@@ -1,7 +1,15 @@
 import {Component, OnInit} from '@angular/core';
-import constructFromString from "../../../../model/TM/TMParser";
+import constructFromString, {
+    getCommentLines,
+    getCompilerHintLines,
+    getLineByLineStructure
+} from "../../../../model/TM/TMParser";
 import {TMRendererService} from "../../../services/t-m-renderer.service";
 import TuringMachine from "../../../../model/TM/TuringMachine";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {DownloadDialogComponent} from "../download-dialog/download-dialog.component";
+import constructFromTM from "../../../../model/TM/TMToString";
+import {FileStructure} from "../../../../model/TM/FileStructure";
 
 @Component({
     selector: 'app-header',
@@ -10,12 +18,13 @@ import TuringMachine from "../../../../model/TM/TuringMachine";
 })
 export class HeaderComponent implements OnInit {
 
-    constructor(private tmRendererService: TMRendererService) {
-
+    private readFileBefore: boolean = false;
+    private sourceText: string = "";
+    constructor(private tmRendererService: TMRendererService, private dialog: MatDialog) {
     }
 
     ngOnInit(): void {
-        // TODO Debug
+        // TODO Debug. Remove string.
         let target: string =
             "# Informationen zum Abgabeformat\n" +
             "# Informationen zum Abgabeformat\n" +
@@ -84,6 +93,8 @@ export class HeaderComponent implements OnInit {
             "# Geben Sie hier die akzeptierenden Zustände an.\n" +
             "acc_states = \tq_e";
 
+        this.sourceText = target;
+        this.readFileBefore = true;
         let tm: TuringMachine = constructFromString(target);
         this.tmRendererService.render(tm);
     }
@@ -91,17 +102,46 @@ export class HeaderComponent implements OnInit {
     public fileHandleChanged(event: any): void {
         let file: File = event.target.files[0];
         if (file) {
-            console.log(file);
             let reader: FileReader = new FileReader();
             reader.onload = (e) => {
                 let target: any = e.target;
                 let data: string = target.result;
 
                 let tm: TuringMachine = constructFromString(data);
+                this.readFileBefore = true;
+                this.sourceText = data;
             };
 
             reader.readAsText(file);
         }
     }
 
+    public createDownloadHandle(keepPreviousFileStructure: boolean): void {
+        let compilerHints: string[] = [];
+        let comments: string[] = [];
+        let fileStructure: FileStructure[] = [];
+
+        if(keepPreviousFileStructure) {
+            compilerHints = getCompilerHintLines(this.sourceText);
+            comments = getCommentLines(this.sourceText);
+            fileStructure = getLineByLineStructure(this.sourceText);
+        }
+
+        let tmAsString: string = constructFromTM(TuringMachine.Instance, comments, compilerHints, fileStructure);
+    }
+
+    public onDownloadClicked(): void {
+        if(this.readFileBefore) {
+            const dialogRef: MatDialogRef<DownloadDialogComponent> = this.dialog.open(DownloadDialogComponent, {
+                width: '300px',
+
+            });
+
+            dialogRef.afterClosed().subscribe((result) => {
+                this.createDownloadHandle(result);
+            });
+        } else {
+            this.createDownloadHandle(false);
+        }
+    }
 }
