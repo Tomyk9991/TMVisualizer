@@ -1,6 +1,7 @@
 import State from "./State";
 import Transition from "./Transition";
 import {deepCopy} from "../../utils/DeepCopy";
+import ValidationResult from "./ValidationResult";
 
 export default class TuringMachine {
     public static Instance: TuringMachine;
@@ -13,7 +14,7 @@ export default class TuringMachine {
     // q_1, a -> q_2, b | R
     // q_1, a -> q_3, a | R
     // this is illegal
-    public validateDeterminism(): Transition[] {
+    public validateDeterminism(): ValidationResult {
         let duplicatePredicateTransitions: Set<Transition> = new Set<Transition>();
 
         for (let i = 0; i < this.states.length; i++) {
@@ -26,17 +27,35 @@ export default class TuringMachine {
 
                if (hasDuplicate) {
                    let duplicateTransitionPredicates: Transition[] = transitionsFromState.filter(t => t.predicate === element);
-                   while(duplicateTransitionPredicates.length > 1) {
+                   while(duplicateTransitionPredicates.length === 0) {
                        duplicatePredicateTransitions.add(duplicateTransitionPredicates.pop()!);
                    }
                }
             });
         }
-        return Array.from(duplicatePredicateTransitions.values());
+
+        return new ValidationResult(Array.from(duplicatePredicateTransitions.values()));
     }
 
-    public deepCopy(): TuringMachine {
-        return deepCopy(this);
+    public validateDeterminismInState(state: State): ValidationResult | null {
+        let duplicatePredicateTransitions: Set<Transition> = new Set<Transition>();
+
+        let transitionsFromState: Transition[] = this.transitions.filter(t => t.currentState == state);
+        let predicatesInState: string[] = transitionsFromState.map(t => t.predicate);
+        // to to find a predicate more than one time
+        predicatesInState.some((element: string, index: number) => {
+            let hasDuplicate: boolean = predicatesInState.indexOf(element) !== index;
+
+            if (hasDuplicate) {
+                let duplicateTransitionPredicates: Transition[] = transitionsFromState.filter(t => t.predicate === element);
+                while(duplicateTransitionPredicates.length > 0) {
+                    duplicatePredicateTransitions.add(duplicateTransitionPredicates.pop()!);
+                }
+            }
+        });
+
+        let arr: Transition[] = Array.from(duplicatePredicateTransitions.values());
+        return arr.length > 0 ? new ValidationResult(arr, undefined) : null;
     }
 
     public validatePredicates(): Transition[] {

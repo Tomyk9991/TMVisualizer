@@ -8,6 +8,7 @@ import {map, startWith} from "rxjs/operators";
 import TuringMachine from "../../../../model/TM/TuringMachine";
 import {TMRendererService} from "../../../services/t-m-renderer.service";
 import AutoCompleteHelper, {TransitionPart} from "./AutoCompleteHelper";
+import ValidationResult from "../../../../model/TM/ValidationResult";
 
 @Component({
     selector: 'app-state-editor',
@@ -26,7 +27,10 @@ export class StateEditorComponent implements OnInit {
 
     public numTransitions: number = 0;
     public formHelpers: AutoCompleteHelper[][] = [];
-    public transitionError: string = "";
+
+
+    public errorMessage: string = "";
+    private predicateErrors: string[] = [];
 
     public readonly labels: string[] = [
         "Predicate",
@@ -43,6 +47,9 @@ export class StateEditorComponent implements OnInit {
                 this.state = data.state;
                 StateEditorComponent._hasState = true;
                 this.turingMachine = data.transitions;
+
+                this.errorMessage = "";
+                this.predicateErrors = [];
 
                 this.updateAutoCompleteHelpers();
             }
@@ -66,7 +73,9 @@ export class StateEditorComponent implements OnInit {
             AutoCompleteHelper.TM = <TuringMachine> this.turingMachine;
         }
 
-        for (let i = 0; i < this.numTransitions; i++) {
+        this.predicateErrors = new Array<string>(this.numTransitions + 1);
+        let counter: number = 0;
+        for (let i = 0, j = 0; i < this.numTransitions; i++, j += 4) {
             this.formHelpers[i] = [];
             // predicate
             this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), tape_alphabet, transitions[i].predicate, TransitionPart.Predicate, transitions[i]));
@@ -77,16 +86,37 @@ export class StateEditorComponent implements OnInit {
             // direction
             this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), directions, <string>transitions[i].direction, TransitionPart.Direction, transitions[i]));
 
+
             for (let j = 0; j < 4; j++) {
                 this.formHelpers[i][j].filteredOptions = this.formHelpers[i][j].formControl.valueChanges.pipe(
                     startWith(''),
                     map(value => {
-                        let [result, error] = this.formHelpers[i][j].filter(value);
-                        if(error !== "") {
-                            this.transitionError = error === '-' ? "" : error;
+                        let result = this.formHelpers[i][j].filter(value);
+
+                        if(this.formHelpers[i][j].transitionPart === TransitionPart.Predicate) {
+                            // if (counter >= this.numTransitions) {
+                                let validation: ValidationResult | null = null;
+                                let validationAllTransitions: ValidationResult | null = AutoCompleteHelper.TM.validateDeterminismInState(<State>this.state);
+
+                                for (let k = 0; k < this.numTransitions; k++) {
+                                    let validation: ValidationResult | null = this.formHelpers[k][j]
+                                        .checkModel(this.formHelpers[k][j].transition.currentState, this.formHelpers[k][j].formControl.value);
+
+                                    if (validation) {
+                                        this.predicateErrors[k] = validation.toString();
+                                    } else {
+                                        this.predicateErrors[k] = "";
+                                    }
+                                }
+
+                                this.predicateErrors[this.numTransitions] = validationAllTransitions ? validationAllTransitions.toString() : "";
+                                this.errorMessage = this.predicateErrors.filter(s => s !== "").join("\n");
+                            // }
+                            counter++;
                         }
+
                         return result;
-                    }),
+                    })
                 );
             }
         }
@@ -94,6 +124,11 @@ export class StateEditorComponent implements OnInit {
 
     ngOnInit(): void {
         this.updateAutoCompleteHelpers();
+        this.errorMessage = this.predicateErrors.filter(s => s !== "").join("\n");
+    }
+
+    public hasErrors(): boolean {
+        return this.predicateErrors.filter(s => s !== "").length > 0;
     }
 
     public isInitialState(): boolean {

@@ -37,8 +37,8 @@
         </div>
 
         <div class="addButton">
-            <mat-label [innerText]="transitionError"></mat-label>
-            <button mat-mini-fab color="primary" (click)="this.addTransition()">
+            <mat-label [innerText]="errorMessage"></mat-label>
+            <button mat-mini-fab color="primary" [disabled]="this.hasErrors()" (click)="this.addTransition()">
                 <mat-icon>queue</mat-icon>
             </button>
         </div>
