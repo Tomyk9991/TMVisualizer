@@ -39,7 +39,7 @@ export default class RemoveStateRemover implements IKeyboardCallback {
             let iState: StateDrawer = (<StateDrawer><unknown>stateDrawer);
 
 
-            this.tm.setTransitions(this.tm.transitions.filter(t => t.currentState != stateDrawer?.state && t.nextState != stateDrawer?.state));
+            this.tm.transitions = this.tm.transitions.filter(t => t.currentState != stateDrawer?.state && t.nextState != stateDrawer?.state);
             removePosition(iState.position);
             this.tm.states = this.tm.states.filter(state => state != iState.state);
 

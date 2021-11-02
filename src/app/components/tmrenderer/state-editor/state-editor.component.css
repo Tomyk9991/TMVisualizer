@@ -21,9 +21,13 @@
 .addButton {
     display: flex;
     justify-content: flex-end;
-    width: 40px;
     margin-top: 15px;
     width: 100%;
+}
+
+.addButton mat-label  {
+    margin-right: auto;
+    color: red;
 }
 
 .inputField {

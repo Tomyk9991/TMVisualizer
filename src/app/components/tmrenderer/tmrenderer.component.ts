@@ -12,6 +12,7 @@ import KeyboardCallbackManager from "./Drawers/managers/KeyboardCallbackManager"
 import StateEditorService from "../../services/state-editor.service";
 import CreateStateCreater from "./KeyboardCallbackInstances/CreateStateCreater";
 import RemoveStateRemover from "./KeyboardCallbackInstances/RemoveStateRemover";
+import Transition from "../../../model/TM/Transition";
 
 @Component({
     selector: 'app-tmrenderer',
@@ -150,7 +151,6 @@ function resetSketch(p: any, resetPositions: boolean): void {
         stateDrawers.push(stateDrawer);
     }
 
-
     for (let i = 0; i < tm.transitions.length; i++) {
         let currentStateDrawer: StateDrawer = <StateDrawer>stateDrawers.find((drawer: StateDrawer) => drawer.state == tm.transitions[i].currentState);
         let nextStateDrawer: StateDrawer = <StateDrawer>stateDrawers.find((drawer: StateDrawer) => drawer.state == tm.transitions[i].nextState);
@@ -158,7 +158,6 @@ function resetSketch(p: any, resetPositions: boolean): void {
         let transitionDrawer: TransitionDrawer = new TransitionDrawer(tm.transitions[i], currentStateDrawer, nextStateDrawer, <p5>TMRendererComponent.p5);
         transitionsDrawers.push(transitionDrawer);
     }
-
 }
 
 function draw(p: any): void {

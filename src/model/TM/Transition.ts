@@ -23,10 +23,9 @@ export default class Transition {
 
         return TMDirection.NotInitialized;
     }
-}
 
-
-// TODO Make Initial position work in state editor and drawer
-export class InitialTransition extends Transition {
-
+    // q_1, a -> q_3, a | R
+    public toString(): string {
+        return this.currentState.Name + ", " + this.predicate + " -> " + this.nextState.Name + ", " + this.manipulationValue + " | " + <string>this.direction;
+    }
 }

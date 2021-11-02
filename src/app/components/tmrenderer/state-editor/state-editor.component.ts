@@ -4,10 +4,10 @@ import Transition from "../../../../model/TM/Transition";
 import StateEditorService from "../../../services/state-editor.service";
 import {StateTransitionEditorPair} from "../../../services/StateTransitionEditorPair";
 import {FormControl} from "@angular/forms";
-import {Observable} from "rxjs";
 import {map, startWith} from "rxjs/operators";
 import TuringMachine from "../../../../model/TM/TuringMachine";
 import {TMRendererService} from "../../../services/t-m-renderer.service";
+import AutoCompleteHelper, {TransitionPart} from "./AutoCompleteHelper";
 
 @Component({
     selector: 'app-state-editor',
@@ -15,6 +15,8 @@ import {TMRendererService} from "../../../services/t-m-renderer.service";
     styleUrls: ['./state-editor.component.css'],
     encapsulation: ViewEncapsulation.None
 })
+
+
 export class StateEditorComponent implements OnInit {
     public state?: State;
     public turingMachine?: TuringMachine;
@@ -24,6 +26,8 @@ export class StateEditorComponent implements OnInit {
 
     public numTransitions: number = 0;
     public formHelpers: AutoCompleteHelper[][] = [];
+    public transitionError: string = "";
+
     public readonly labels: string[] = [
         "Predicate",
         "Next state",
@@ -76,7 +80,13 @@ export class StateEditorComponent implements OnInit {
             for (let j = 0; j < 4; j++) {
                 this.formHelpers[i][j].filteredOptions = this.formHelpers[i][j].formControl.valueChanges.pipe(
                     startWith(''),
-                    map(value => this.formHelpers[i][j].filter(value)),
+                    map(value => {
+                        let [result, error] = this.formHelpers[i][j].filter(value);
+                        if(error !== "") {
+                            this.transitionError = error === '-' ? "" : error;
+                        }
+                        return result;
+                    }),
                 );
             }
         }
@@ -128,53 +138,4 @@ export class StateEditorComponent implements OnInit {
             this.tmRenderNotifier.render(<TuringMachine>this.turingMachine);
         }
     }
-}
-
-
-class AutoCompleteHelper {
-    public filteredOptions?: Observable<string[]>;
-    public static tmRenderService: TMRendererService;
-    public static TM: TuringMachine;
-
-    constructor(public formControl: FormControl, public values: string[], public def: string, private transitionPart: TransitionPart, private transition: Transition) {
-        formControl.setValue(def);
-    }
-
-    public filter(value: string): string[] {
-        const filterValue: string = value.toLowerCase();
-        let result: string[] = this.values.filter(option => option.toLowerCase() === filterValue);
-
-        if (result.length == 1)
-        {
-            if (this.transitionPart === TransitionPart.Predicate)
-            {
-                this.transition.predicate = result[0];
-                AutoCompleteHelper.tmRenderService.render(AutoCompleteHelper.TM);
-            }
-            else if (this.transitionPart === TransitionPart.NextState)
-            {
-                this.transition.nextState = AutoCompleteHelper.TM.states.filter(s => s.Name === result[0])[0];
-                AutoCompleteHelper.tmRenderService.render(AutoCompleteHelper.TM);
-            }
-            else if (this.transitionPart === TransitionPart.ManipulationValue)
-            {
-                this.transition.manipulationValue = result[0];
-                AutoCompleteHelper.tmRenderService.render(AutoCompleteHelper.TM);
-            }
-            else if (this.transitionPart === TransitionPart.Direction)
-            {
-                this.transition.direction = Transition.stringToTMDirection(result[0]);
-                AutoCompleteHelper.tmRenderService.render(AutoCompleteHelper.TM);
-            }
-        }
-
-        return result;
-    }
-}
-
-enum TransitionPart {
-    Predicate,
-    NextState,
-    ManipulationValue,
-    Direction
 }
