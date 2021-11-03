@@ -3,8 +3,6 @@ import {TMRendererService} from "../../../services/t-m-renderer.service";
 import TuringMachine from "../../../../model/TM/TuringMachine";
 import {FormControl} from "@angular/forms";
 import Transition from "../../../../model/TM/Transition";
-import ValidationResult from "../../../../model/TM/ValidationResult";
-import State from "../../../../model/TM/State";
 
 
 export default class AutoCompleteHelper {
@@ -14,25 +12,6 @@ export default class AutoCompleteHelper {
 
     constructor(public formControl: FormControl, public values: string[], public def: string, public transitionPart: TransitionPart, public transition: Transition) {
         formControl.setValue(def);
-    }
-
-    public checkModel(currentState: State, currentValue: string): ValidationResult | null {
-        if (this.transitionPart === TransitionPart.Predicate) {
-            const filterValue: string = currentValue.toLowerCase();
-            let result: string[] = this.values.filter(option => option.toLowerCase() === filterValue);
-
-            if (currentValue === "~") {
-                return new ValidationResult(undefined, `Predicate ${currentValue} not found`);
-            }
-
-            if (result.length === 0 && filterValue !== "") {
-                return new ValidationResult(undefined, `Predicate ${currentValue} not found`);
-            } else if (currentValue === "") {
-                return new ValidationResult(undefined, "Predicate can't be empty");
-            }
-        }
-
-        return null;
     }
 
     public filter(value: string): string[] {

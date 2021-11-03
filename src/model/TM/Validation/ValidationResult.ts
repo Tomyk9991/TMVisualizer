@@ -1,7 +1,7 @@
-import Transition from "./Transition";
+import Transition from "../Transition";
 
 export default class ValidationResult {
-    constructor(private transitions?: Transition[], private error?: string) {
+    constructor(public transitions?: Transition[], private error?: string) {
 
     }
 

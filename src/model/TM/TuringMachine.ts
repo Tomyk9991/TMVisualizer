@@ -1,7 +1,6 @@
 import State from "./State";
 import Transition from "./Transition";
-import {deepCopy} from "../../utils/DeepCopy";
-import ValidationResult from "./ValidationResult";
+import ValidationResult from "./Validation/ValidationResult";
 
 export default class TuringMachine {
     public static Instance: TuringMachine;
