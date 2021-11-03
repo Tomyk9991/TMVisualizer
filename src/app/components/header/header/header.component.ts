@@ -217,8 +217,8 @@ export class HeaderComponent implements OnInit {
     public onDownloadClicked(): void {
         if(this.readFileBefore) {
             const dialogRef: MatDialogRef<DownloadDialogComponent> = this.dialog.open(DownloadDialogComponent, {
-                width: '300px',
-
+                width: '20%',
+                height: '21%'
             });
 
             dialogRef.afterClosed().subscribe((result) => {

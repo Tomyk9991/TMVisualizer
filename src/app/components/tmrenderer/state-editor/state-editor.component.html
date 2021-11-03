@@ -23,6 +23,10 @@
                 </button>
             </div>
 
+<!--            border-->
+            <div [ngClass]="{'transitionRow' : this.isTransitionInvalid(formHelpers[i][0].transition)}">
+            </div>
+
             <form>
                 <span *ngFor="let num of [0,1,2,3]" >
                     <app-transitionEntry
@@ -37,7 +41,8 @@
         </div>
 
         <div class="addButton">
-            <button mat-mini-fab color="primary" (click)="this.addTransition()">
+            <mat-label [innerText]="this.errorMessage"></mat-label>
+            <button mat-mini-fab color="primary" [disabled]="this.hasErrors()" (click)="this.addTransition()">
                 <mat-icon>queue</mat-icon>
             </button>
         </div>
