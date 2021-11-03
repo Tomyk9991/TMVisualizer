@@ -36,11 +36,8 @@
     border-width: 2px;
     border-radius: 10px;
 
-    position: absolute;
-    right: 0;
-    margin-top: 1px;
-    width: 99%;
-    height: 16.5%
+    position: relative;
+    margin: -2px;
 }
 
 .inputField {

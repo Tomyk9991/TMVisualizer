@@ -24,10 +24,7 @@
             </div>
 
 <!--            border-->
-            <div [ngClass]="{'transitionRow' : this.isTransitionInvalid(formHelpers[i][0].transition)}">
-            </div>
-
-            <form>
+            <form [ngClass]="{'transitionRow' : this.isTransitionInvalid(formHelpers[i][0].transition)}">
                 <span *ngFor="let num of [0,1,2,3]" >
                     <app-transitionEntry
                         [title]="labels[num]"
