@@ -17,14 +17,15 @@
         <mat-divider></mat-divider>
 
         <div *ngFor="let values of [].constructor(this.numTransitions); let i = index">
-            <div class="removeTransitionButton">
-                <button type="button" mat-icon-button color="primary" (click)="this.deleteTransition(i)">
-                    <mat-icon>delete</mat-icon>
-                </button>
-            </div>
 
-<!--            border-->
+
             <form [ngClass]="{'transitionRow' : this.isTransitionInvalid(formHelpers[i][0].transition)}">
+                <div class="removeTransitionButton">
+                    <button type="button" mat-icon-button color="primary" (click)="this.deleteTransition(i)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+                
                 <span *ngFor="let num of [0,1,2,3]" >
                     <app-transitionEntry
                         [title]="labels[num]"
@@ -35,6 +36,7 @@
                     <mat-divider></mat-divider>
                 </span>
             </form>
+
         </div>
 
         <div class="addButton">

@@ -122,18 +122,39 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
                     map(value => {
                         let result = this.formHelpers[i][j].filter(value);
 
-                        if(this.formHelpers[i][j].transitionPart === TransitionPart.Predicate) {
-                            let validationAllTransitions: ValidationResult | null = this.validationChecker
-                                .checkDeterminismInState(AutoCompleteHelper.TM, <State>this.state);
+                        // Validation of turing machine
+                        // Validation Predicate
+                        if (this.formHelpers[i][j].transitionPart === TransitionPart.Predicate) {
+                            this.validationChecker.checkDeterminismInState(AutoCompleteHelper.TM, <State>this.state);
 
                             for (let k = 0; k < this.numTransitions; k++) {
-                                let validation: ValidationResult | null = this.validationChecker.checkPredicateInput(
+                                this.validationChecker.checkPredicateInput(
                                     AutoCompleteHelper.TM,
                                     this.formHelpers[k][j].formControl.value,
                                     k);
                             }
 
-                            this.errorMessage = this.validationChecker.prettyPrint()
+                            this.errorMessage = this.validationChecker.prettyPrint();
+                        } // Validation next state
+                        else if (this.formHelpers[i][j].transitionPart === TransitionPart.NextState) {
+                            this.validationChecker.checkNextStateInput(AutoCompleteHelper.TM,
+                                this.formHelpers[i][j].formControl.value, i
+                            );
+                            this.errorMessage = this.validationChecker.prettyPrint();
+                        } // Validation manipulation value
+                        else if (this.formHelpers[i][j].transitionPart === TransitionPart.ManipulationValue) {
+                            this.validationChecker.checkManipulationValue(AutoCompleteHelper.TM,
+                                this.formHelpers[i][j].formControl.value, i
+                            );
+
+                            this.errorMessage = this.validationChecker.prettyPrint();
+                        } // Validation Direction
+                        else if (this.formHelpers[i][j].transitionPart === TransitionPart.Direction) {
+                            this.validationChecker.checkDirectionValue(AutoCompleteHelper.TM,
+                                this.formHelpers[i][j].formControl.value, i
+                            );
+
+                            this.errorMessage = this.validationChecker.prettyPrint();
                         }
 
                         return result;
