@@ -2,8 +2,8 @@ import {
     AfterViewInit,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
-    Component,
-    OnInit,
+    Component, ElementRef,
+    OnInit, ViewChild,
     ViewEncapsulation
 } from '@angular/core';
 import State from "../../../../model/TM/State";
@@ -17,6 +17,7 @@ import {TMRendererService} from "../../../services/t-m-renderer.service";
 import AutoCompleteHelper, {TransitionPart} from "./AutoCompleteHelper";
 import ValidationResult from "../../../../model/TM/Validation/ValidationResult";
 import ValidationChecker from "../../../../model/TM/Validation/ValidationChecker";
+import {MatFormField, MatFormFieldControl} from "@angular/material/form-field";
 
 @Component({
     selector: 'app-state-editor',
@@ -40,11 +41,21 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
     public validationChecker: ValidationChecker;
     public errorMessage: string = "";
 
+    public isEditingStateName: boolean = false;
+
+    @ViewChild('stateName', { static: false })
+    set input(element: ElementRef<HTMLInputElement>) {
+        if(element) {
+            setTimeout(() => {
+                element.nativeElement.focus()
+            }, 5);
+        }
+    }
+
     public readonly labels: string[] = [
         "Predicate",
         "Next state",
         "Manipulation value",
-        "Direction"
     ];
 
     public readonly lPos: 'before' | 'after' = 'before'
@@ -73,6 +84,14 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
         this.updateAutoCompleteHelpers();
         this.errorMessage = this.validationChecker.prettyPrint();
         this.ref.markForCheck();
+    }
+
+    public getHeight(): string {
+        let margin: number = 15;
+        let pixel: number = margin + this.errorMessage.split('\n').length * 20;
+        pixel = Math.max(pixel, margin + 40);
+
+        return pixel + "px";
     }
 
     public isTransitionInvalid(transition: Transition): boolean {
@@ -105,7 +124,9 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
 
         this.validationChecker.setAmountPredicates(this.numTransitions + 1);
 
-        for (let i = 0, j = 0; i < this.numTransitions; i++, j += 4) {
+        const amountLabels: number = 3;
+
+        for (let i = 0, j = 0; i < this.numTransitions; i++, j += amountLabels) {
             this.formHelpers[i] = [];
             // predicate
             this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), tape_alphabet, transitions[i].predicate, TransitionPart.Predicate, transitions[i]));
@@ -113,27 +134,35 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
             this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), allStates, transitions[i].nextState.Name, TransitionPart.NextState, transitions[i]));
             // manipulation value
             this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), tape_alphabet, transitions[i].manipulationValue, TransitionPart.ManipulationValue, transitions[i]));
-            // direction
-            this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), directions, <string>transitions[i].direction, TransitionPart.Direction, transitions[i]));
 
-            for (let j = 0; j < 4; j++) {
+            for (let j = 0; j < amountLabels; j++) {
                 this.formHelpers[i][j].filteredOptions = this.formHelpers[i][j].formControl.valueChanges.pipe(
                     startWith(''),
                     map(value => {
                         let result = this.formHelpers[i][j].filter(value);
 
-                        if(this.formHelpers[i][j].transitionPart === TransitionPart.Predicate) {
-                            let validationAllTransitions: ValidationResult | null = this.validationChecker
-                                .checkDeterminismInState(AutoCompleteHelper.TM, <State>this.state);
+                        // Validation of turing machine
+                        if (this.formHelpers[i][j].transitionPart === TransitionPart.Predicate) {
+                            this.validationChecker.checkDeterminismInState(AutoCompleteHelper.TM, <State>this.state);
 
                             for (let k = 0; k < this.numTransitions; k++) {
-                                let validation: ValidationResult | null = this.validationChecker.checkPredicateInput(
+                                this.validationChecker.checkPredicateInput(
                                     AutoCompleteHelper.TM,
                                     this.formHelpers[k][j].formControl.value,
                                     k);
                             }
+                            this.errorMessage = this.validationChecker.prettyPrint();
+                        } else if (this.formHelpers[i][j].transitionPart === TransitionPart.NextState) {
+                            this.validationChecker.checkNextStateInput(AutoCompleteHelper.TM,
+                                this.formHelpers[i][j].formControl.value, i
+                            );
+                            this.errorMessage = this.validationChecker.prettyPrint();
+                        } else if (this.formHelpers[i][j].transitionPart === TransitionPart.ManipulationValue) {
+                            this.validationChecker.checkManipulationValue(AutoCompleteHelper.TM,
+                                this.formHelpers[i][j].formControl.value, i
+                            );
 
-                            this.errorMessage = this.validationChecker.prettyPrint()
+                            this.errorMessage = this.validationChecker.prettyPrint();
                         }
 
                         return result;
@@ -175,6 +204,25 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
         this.ref.markForCheck();
     }
 
+    public isSelectedButton(i: number, direction: string): string {
+        const primary: string = "#e91e63";
+        const unselected: string = "#5b5b5b";
+
+        let allTransitions: Transition[] = this.turingMachine?.transitions.filter(t => t.currentState == this.state) ?? [];
+        let targetTransition: Transition = allTransitions[i];
+
+        return (<string>targetTransition.direction) === direction ? primary : unselected;
+    }
+
+    public onDirectionChanged(i: number, newDirection: string, buttonNumber: number): void {
+        let allTransitions: Transition[] = this.turingMachine?.transitions.filter(t => t.currentState == this.state) ?? [];
+        let targetTransition: Transition = allTransitions[i];
+
+        targetTransition.direction = Transition.stringToTMDirection(newDirection);
+        this.tmRenderNotifier.render(<TuringMachine>this.turingMachine);
+        this.ref.markForCheck();
+    }
+
     public addTransition(): void {
         let transition: Transition = new Transition(<State>this.state, "~", <State>this.state, "~", "L");
         (<TuringMachine>this.turingMachine).transitions.push(transition);
@@ -199,5 +247,22 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
                 this.ref.markForCheck();
             }, 0);
         }
+    }
+
+
+
+
+    public onStateNameChanged(event: any, element: HTMLInputElement): void {
+        let result: ValidationResult | null = this.validationChecker.checkStateName(TuringMachine.Instance, element.value, (<State>this.state).Name);
+
+        if (event.key === 'Enter') {
+            if (!result) { // No errors, so send it so the turing machine
+                (<State>this.state).Name = element.value;
+                this.isEditingStateName = false;
+            }
+        }
+
+        this.errorMessage = this.validationChecker.prettyPrint();
+        this.ref.markForCheck();
     }
 }

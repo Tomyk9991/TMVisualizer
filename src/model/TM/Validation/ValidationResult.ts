@@ -1,7 +1,7 @@
 import Transition from "../Transition";
 
 export default class ValidationResult {
-    constructor(public transitions?: Transition[], private error?: string) {
+    constructor(public transitions?: Transition[], public error?: string) {
 
     }
 
@@ -11,7 +11,7 @@ export default class ValidationResult {
         }
 
         if (this.transitions) {
-            return this.transitions.join(joinOperator ?? '\n');
+            return this.transitions.join(joinOperator ?? '\n\t\t\t\t\t');
         }
 
         return "";

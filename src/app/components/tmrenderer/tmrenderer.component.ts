@@ -12,7 +12,6 @@ import KeyboardCallbackManager from "./Drawers/managers/KeyboardCallbackManager"
 import StateEditorService from "../../services/state-editor.service";
 import CreateStateCreater from "./KeyboardCallbackInstances/CreateStateCreater";
 import RemoveStateRemover from "./KeyboardCallbackInstances/RemoveStateRemover";
-import Transition from "../../../model/TM/Transition";
 
 @Component({
     selector: 'app-tmrenderer',

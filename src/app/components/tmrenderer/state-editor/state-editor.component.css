@@ -4,6 +4,7 @@
     right: 0px;
     width: 33%;
     margin-right: 40px;
+    min-width: 467px;
 
     animation-name: slideLeft;
     animation-duration: 0.15s;
@@ -22,6 +23,7 @@
     display: flex;
     justify-content: flex-end;
     margin-top: 15px;
+    height: 40px;
     width: 100%;
 }
 
@@ -30,17 +32,34 @@
     color: red;
 }
 
+.container {
+    min-height: 40px;
+    overflow: hidden;
+    height: 51px;
+}
+
+.errorLabel {
+    position: relative;
+    top: -40px;
+    display: flex;
+    height: auto;
+
+    color: #e3005c;
+
+    white-space: break-spaces;
+
+    justify-content: flex-start;
+}
+
 .transitionRow {
     color: #c2185b;
     border-style: solid;
     border-width: 2px;
     border-radius: 10px;
+    width: 101%;
 
-    position: absolute;
-    right: 0;
-    margin-top: 1px;
-    width: 99%;
-    height: 16.5%
+    position: relative;
+    margin: -2px;
 }
 
 .inputField {
@@ -63,4 +82,5 @@
 
 .card {
     width: 100%;
+    overflow: visible;
 }

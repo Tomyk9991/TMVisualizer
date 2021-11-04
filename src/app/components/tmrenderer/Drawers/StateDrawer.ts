@@ -119,7 +119,11 @@ export default class StateDrawer implements IDrawer, IInteractable, IKeyboardCal
 
     keyPressed(ctx: p5, key: string): void {
         if (ctx.focused && this.mouseOverlapping && key == ' ') {
-            this.stateEditorService.render(this.state, this.turingMachine);
+            let element: Element | null = document.activeElement;
+
+            if (element instanceof HTMLBodyElement) {
+                this.stateEditorService.render(this.state, this.turingMachine);
+            }
         }
     }
 }
