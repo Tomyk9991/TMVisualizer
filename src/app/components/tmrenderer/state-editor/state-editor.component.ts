@@ -2,8 +2,8 @@ import {
     AfterViewInit,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
-    Component,
-    OnInit,
+    Component, ElementRef,
+    OnInit, ViewChild,
     ViewEncapsulation
 } from '@angular/core';
 import State from "../../../../model/TM/State";
@@ -17,6 +17,7 @@ import {TMRendererService} from "../../../services/t-m-renderer.service";
 import AutoCompleteHelper, {TransitionPart} from "./AutoCompleteHelper";
 import ValidationResult from "../../../../model/TM/Validation/ValidationResult";
 import ValidationChecker from "../../../../model/TM/Validation/ValidationChecker";
+import {MatFormField, MatFormFieldControl} from "@angular/material/form-field";
 
 @Component({
     selector: 'app-state-editor',
@@ -39,6 +40,17 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
 
     public validationChecker: ValidationChecker;
     public errorMessage: string = "";
+
+    public isEditingStateName: boolean = false;
+
+    @ViewChild('stateName', { static: false })
+    set input(element: ElementRef<HTMLInputElement>) {
+        if(element) {
+            setTimeout(() => {
+                element.nativeElement.focus()
+            }, 5);
+        }
+    }
 
     public readonly labels: string[] = [
         "Predicate",
@@ -207,12 +219,6 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
         let targetTransition: Transition = allTransitions[i];
 
         targetTransition.direction = Transition.stringToTMDirection(newDirection);
-
-        for (let j = 0; j < 3; j++) {
-
-        }
-
-
         this.tmRenderNotifier.render(<TuringMachine>this.turingMachine);
         this.ref.markForCheck();
     }
@@ -241,5 +247,22 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
                 this.ref.markForCheck();
             }, 0);
         }
+    }
+
+
+
+
+    public onStateNameChanged(event: any, element: HTMLInputElement): void {
+        let result: ValidationResult | null = this.validationChecker.checkStateName(TuringMachine.Instance, element.value, (<State>this.state).Name);
+
+        if (event.key === 'Enter') {
+            if (!result) { // No errors, so send it so the turing machine
+                (<State>this.state).Name = element.value;
+                this.isEditingStateName = false;
+            }
+        }
+
+        this.errorMessage = this.validationChecker.prettyPrint();
+        this.ref.markForCheck();
     }
 }

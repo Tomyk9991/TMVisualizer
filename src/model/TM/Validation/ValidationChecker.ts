@@ -10,6 +10,7 @@ export default class ValidationChecker {
     private nextStateErrors: string[] = [];
     private manipulationErrors: string[] = [];
     private directionErrors: string[] = [];
+    private stateNameError: string = "";
 
     private concatArray: string[] = [];
 
@@ -18,12 +19,14 @@ export default class ValidationChecker {
         this.nextStateErrors = new Array<string>(num - 1);
         this.manipulationErrors = new Array<string>(num - 1);
         this.directionErrors = new Array<string>(num - 1);
+        this.stateNameError = "";
 
         this.concatArray = new Array<string>(
             this.predicateErrors.length +
             this.nextStateErrors.length +
             this.manipulationErrors.length +
-            this.directionErrors.length
+            this.directionErrors.length +
+            1
         );
     }
 
@@ -45,7 +48,8 @@ export default class ValidationChecker {
         return  this.predicateErrors.filter(s => s !== "").length > 0 ||
                 this.nextStateErrors.filter(s => s !== "").length > 0 ||
                 this.manipulationErrors.filter(s => s !== "").length > 0 ||
-                this.directionErrors.filter(s => s !== "").length > 0;
+                this.directionErrors.filter(s => s !== "").length > 0 ||
+                this.stateNameError !== "";
     }
 
     public checkNextStateInput(turingMachine: TuringMachine, value: string, index?: number): ValidationResult | null {
@@ -138,6 +142,10 @@ export default class ValidationChecker {
             this.concatArray[i + offset] = this.directionErrors[i];
         }
 
+        offset += this.directionErrors.length;
+        this.concatArray[this.concatArray.length - 1] = this.stateNameError;
+
+
         return this.concatArray.filter(s => (s !== "" && s !== undefined)).join("\n");
     }
 
@@ -165,5 +173,29 @@ export default class ValidationChecker {
         }
 
         return null;
+    }
+
+    public checkStateName(turingMachine: TuringMachine, value: string, allowedValue: string): ValidationResult | null {
+        let result: ValidationResult | null = null;
+        let r: State[] = turingMachine.states.filter(s => s.Name.toLowerCase() === value.toLowerCase());
+
+        if(value.trim().toLowerCase() === allowedValue.toLowerCase()) {
+            this.stateNameError = "";
+            return null;
+        }
+
+        if (r.length > 0) {
+            let message: string = `${value} is already in use`;
+            result = new ValidationResult(undefined, message);
+        }
+
+        if (value.trim() === "") {
+            result = new ValidationResult(undefined, this.emptyLabelStringError("State name"));
+        }
+
+        this.stateNameError = result == null ? "" : result.toString();
+
+
+        return result;
     }
 }

@@ -1,7 +1,22 @@
 <div *ngIf="this.state" class="topRight">
     <mat-card class="card">
         <mat-card-subtitle>Edit state</mat-card-subtitle>
-        <mat-card-title>{{this.state?.Name}}</mat-card-title>
+        <div style="display: inline-block; height: 100%; width: 100%">
+
+            <mat-card-title *ngIf="!isEditingStateName" (dblclick)="this.isEditingStateName = true">
+                {{this.state?.Name}}
+                <mat-icon style="cursor: pointer" (click)="isEditingStateName = true" matSuffix>mode_edit</mat-icon>
+            </mat-card-title>
+        </div>
+
+        <div *ngIf="isEditingStateName">
+            <mat-form-field appearance="fill">
+                <mat-label type="text">State name</mat-label>
+                <input (focusout)="this.isEditingStateName = false" #stateName (keyup)="this.onStateNameChanged($event, stateName)"
+                       type="text" matInput [placeholder]="this.state?.Name!">
+                <mat-icon matSuffix>mode_edit</mat-icon>
+            </mat-form-field>
+        </div>
 
         <div class="closeButton">
             <button mat-icon-button color="primary" (click)="onClose()">
