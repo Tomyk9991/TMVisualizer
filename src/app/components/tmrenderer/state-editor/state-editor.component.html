@@ -25,26 +25,43 @@
                         <mat-icon>delete</mat-icon>
                     </button>
                 </div>
-                
-                <span *ngFor="let num of [0,1,2,3]" >
+
+                <span *ngFor="let num of [0,1,2]" >
                     <app-transitionEntry
                         [title]="labels[num]"
                         [control]="formHelpers[i][num].formControl"
                         [options]="formHelpers[i][num].filteredOptions!!"></app-transitionEntry>
                     <mat-icon *ngIf="num == 0">arrow_forward</mat-icon>
+
+
                     <mat-label style="font-size: 30px" *ngIf="num > 0 && num < 3"> , </mat-label>
                     <mat-divider></mat-divider>
                 </span>
+                <span style="display: inline-block;">
+                    <button type="button" style="margin-right: 5px" [style.background-color]="this.isSelectedButton(i, 'L')"
+                            mat-mini-fab (click)="this.onDirectionChanged(i, 'L', 0)">
+                        <mat-icon>chevron_left</mat-icon>
+                    </button>
+                    <button type="button" style="margin-right: 5px" [style.background-color]="this.isSelectedButton(i, 'N')"
+                            mat-mini-fab (click)="this.onDirectionChanged(i, 'N', 1)">
+                        <mat-icon>remove</mat-icon>
+                    </button>
+                    <button type="button" [style.background-color]="this.isSelectedButton(i, 'R')"
+                            mat-mini-fab (click)="this.onDirectionChanged(i, 'R', 2)">
+                        <mat-icon>chevron_right</mat-icon>
+                    </button>
+                </span>
             </form>
-
         </div>
 
-        <div class="addButton">
-            <mat-label [innerText]="this.errorMessage"></mat-label>
-            <button mat-mini-fab color="primary" [disabled]="this.hasErrors()" (click)="this.addTransition()">
-                <mat-icon>queue</mat-icon>
-            </button>
-        </div>
+        <div [style.height]="this.getHeight()" class="container">
+            <div class="addButton">
+                <button mat-mini-fab color="primary" [disabled]="this.hasErrors()" (click)="this.addTransition()">
+                    <mat-icon>queue</mat-icon>
+                </button>
+            </div>
 
+            <label class="errorLabel" [innerText]="this.errorMessage"></label>
+        </div>
     </mat-card>
 </div>

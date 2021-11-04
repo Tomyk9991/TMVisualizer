@@ -3,7 +3,7 @@ import ValidationResult from "./ValidationResult";
 import TuringMachine from "../TuringMachine";
 
 export default class ValidationChecker {
-    private static readonly DeterminismErrorString: string = "Determinism error: ";
+    private static readonly DeterminismErrorString: string = "Determinism error:\t";
     private emptyLabelStringError(label: string): string { return `${label} can't be empty`}
 
     private predicateErrors: string[] = [];
@@ -138,7 +138,7 @@ export default class ValidationChecker {
             this.concatArray[i + offset] = this.directionErrors[i];
         }
 
-        return this.concatArray.filter(s => s !== "").join("\n");
+        return this.concatArray.filter(s => (s !== "" && s !== undefined)).join("\n");
     }
 
 

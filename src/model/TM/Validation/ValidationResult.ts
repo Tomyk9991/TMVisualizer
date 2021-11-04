@@ -11,7 +11,7 @@ export default class ValidationResult {
         }
 
         if (this.transitions) {
-            return this.transitions.join(joinOperator ?? '\n');
+            return this.transitions.join(joinOperator ?? '\n\t\t\t\t\t');
         }
 
         return "";

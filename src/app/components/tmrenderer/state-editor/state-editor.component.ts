@@ -44,7 +44,6 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
         "Predicate",
         "Next state",
         "Manipulation value",
-        "Direction"
     ];
 
     public readonly lPos: 'before' | 'after' = 'before'
@@ -73,6 +72,14 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
         this.updateAutoCompleteHelpers();
         this.errorMessage = this.validationChecker.prettyPrint();
         this.ref.markForCheck();
+    }
+
+    public getHeight(): string {
+        let margin: number = 15;
+        let pixel: number = margin + this.errorMessage.split('\n').length * 20;
+        pixel = Math.max(pixel, margin + 40);
+
+        return pixel + "px";
     }
 
     public isTransitionInvalid(transition: Transition): boolean {
@@ -105,7 +112,9 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
 
         this.validationChecker.setAmountPredicates(this.numTransitions + 1);
 
-        for (let i = 0, j = 0; i < this.numTransitions; i++, j += 4) {
+        const amountLabels: number = 3;
+
+        for (let i = 0, j = 0; i < this.numTransitions; i++, j += amountLabels) {
             this.formHelpers[i] = [];
             // predicate
             this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), tape_alphabet, transitions[i].predicate, TransitionPart.Predicate, transitions[i]));
@@ -113,17 +122,14 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
             this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), allStates, transitions[i].nextState.Name, TransitionPart.NextState, transitions[i]));
             // manipulation value
             this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), tape_alphabet, transitions[i].manipulationValue, TransitionPart.ManipulationValue, transitions[i]));
-            // direction
-            this.formHelpers[i].push(new AutoCompleteHelper(new FormControl(), directions, <string>transitions[i].direction, TransitionPart.Direction, transitions[i]));
 
-            for (let j = 0; j < 4; j++) {
+            for (let j = 0; j < amountLabels; j++) {
                 this.formHelpers[i][j].filteredOptions = this.formHelpers[i][j].formControl.valueChanges.pipe(
                     startWith(''),
                     map(value => {
                         let result = this.formHelpers[i][j].filter(value);
 
                         // Validation of turing machine
-                        // Validation Predicate
                         if (this.formHelpers[i][j].transitionPart === TransitionPart.Predicate) {
                             this.validationChecker.checkDeterminismInState(AutoCompleteHelper.TM, <State>this.state);
 
@@ -133,24 +139,14 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
                                     this.formHelpers[k][j].formControl.value,
                                     k);
                             }
-
                             this.errorMessage = this.validationChecker.prettyPrint();
-                        } // Validation next state
-                        else if (this.formHelpers[i][j].transitionPart === TransitionPart.NextState) {
+                        } else if (this.formHelpers[i][j].transitionPart === TransitionPart.NextState) {
                             this.validationChecker.checkNextStateInput(AutoCompleteHelper.TM,
                                 this.formHelpers[i][j].formControl.value, i
                             );
                             this.errorMessage = this.validationChecker.prettyPrint();
-                        } // Validation manipulation value
-                        else if (this.formHelpers[i][j].transitionPart === TransitionPart.ManipulationValue) {
+                        } else if (this.formHelpers[i][j].transitionPart === TransitionPart.ManipulationValue) {
                             this.validationChecker.checkManipulationValue(AutoCompleteHelper.TM,
-                                this.formHelpers[i][j].formControl.value, i
-                            );
-
-                            this.errorMessage = this.validationChecker.prettyPrint();
-                        } // Validation Direction
-                        else if (this.formHelpers[i][j].transitionPart === TransitionPart.Direction) {
-                            this.validationChecker.checkDirectionValue(AutoCompleteHelper.TM,
                                 this.formHelpers[i][j].formControl.value, i
                             );
 
@@ -193,6 +189,31 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
     public onClose() {
         StateEditorComponent._hasState = false;
         this.state = undefined;
+        this.ref.markForCheck();
+    }
+
+    public isSelectedButton(i: number, direction: string): string {
+        const primary: string = "#e91e63";
+        const unselected: string = "#5b5b5b";
+
+        let allTransitions: Transition[] = this.turingMachine?.transitions.filter(t => t.currentState == this.state) ?? [];
+        let targetTransition: Transition = allTransitions[i];
+
+        return (<string>targetTransition.direction) === direction ? primary : unselected;
+    }
+
+    public onDirectionChanged(i: number, newDirection: string, buttonNumber: number): void {
+        let allTransitions: Transition[] = this.turingMachine?.transitions.filter(t => t.currentState == this.state) ?? [];
+        let targetTransition: Transition = allTransitions[i];
+
+        targetTransition.direction = Transition.stringToTMDirection(newDirection);
+
+        for (let j = 0; j < 3; j++) {
+
+        }
+
+
+        this.tmRenderNotifier.render(<TuringMachine>this.turingMachine);
         this.ref.markForCheck();
     }
 
