@@ -17,6 +17,7 @@ import {TMRendererService} from "../../../services/t-m-renderer.service";
 import AutoCompleteHelper, {TransitionPart} from "./AutoCompleteHelper";
 import ValidationResult from "../../../../model/TM/Validation/ValidationResult";
 import ValidationChecker from "../../../../model/TM/Validation/ValidationChecker";
+import {I18nService} from "../../../services/i18n.service";
 
 @Component({
     selector: 'app-state-editor',
@@ -52,15 +53,11 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
         }
     }
 
-    public readonly labels: string[] = [
-        "Prädikat",
-        "Nächster Zustand",
-        "Schreibwert",
-    ];
+    public labels: string[] = [];
 
     public readonly lPos: 'before' | 'after' = 'before'
 
-    constructor(private rendererNotifier: StateEditorService, private tmRenderNotifier: TMRendererService, private ref: ChangeDetectorRef) {
+    constructor(public i18n: I18nService, private rendererNotifier: StateEditorService, private tmRenderNotifier: TMRendererService, private ref: ChangeDetectorRef) {
         this.rendererNotifier.OnRegisterRender.on((data: StateTransitionEditorPair) => {
             if (data.state != this.state) {
                 this.state = data.state;
@@ -75,6 +72,11 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
                 this.ref.markForCheck();
             }
         });
+        this.labels = [
+            this.i18n.lookUp("predicate"),
+            this.i18n.lookUp("next-state"),
+            this.i18n.lookUp("manipulation-value")
+        ];
 
         this.validationTasks.push(this.performPredicateValidation);
         this.validationTasks.push(this.performNextStateValidation);

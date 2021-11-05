@@ -22,6 +22,7 @@ import {TransitionEntryComponent} from './components/tmrenderer/transitionentry/
 import { DownloadDialogComponent } from './components/header/download-dialog/download-dialog.component';
 import {MatDialogModule} from "@angular/material/dialog";
 import {MatCheckboxModule} from "@angular/material/checkbox";
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
@@ -34,6 +35,7 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
         DownloadDialogComponent
     ],
     imports: [
+        HttpClientModule,
         BrowserModule,
         BrowserAnimationsModule,
         MatSnackBarModule,

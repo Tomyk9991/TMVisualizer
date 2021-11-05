@@ -1,10 +1,13 @@
 import State from "../State";
 import ValidationResult from "./ValidationResult";
 import TuringMachine from "../TuringMachine";
+import {I18nService} from "../../../app/services/i18n.service";
 
 export default class ValidationChecker {
-    private static readonly DeterminismErrorString: string = "Determinismusfehler:\t";
-    private emptyLabelStringError(label: string): string { return `${label} kann nicht leer sein`}
+    private determinismErrorString(): string {
+        return this.i18n.lookUp("determinism-error") + ":\t";
+    }
+    private emptyLabelStringError(label: string): string { return `${label} ${this.i18n.lookUp("cbEmpty")}`}
 
     private predicateErrors: string[] = [];
     private nextStateErrors: string[] = [];
@@ -12,7 +15,12 @@ export default class ValidationChecker {
     private directionErrors: string[] = [];
     private stateNameError: string = "";
 
+    private i18n: I18nService;
     private concatArray: string[] = [];
+
+    public constructor() {
+        this.i18n = I18nService.Instance;
+    }
 
     public setAmountPredicates(num: number): void {
         this.predicateErrors = new Array<string>(num);
@@ -34,7 +42,7 @@ export default class ValidationChecker {
         let result: ValidationResult | null = this.checkPredicateInput_internal(tm, value, index);
 
         if (result && index !== undefined) {
-            this.predicateErrors[index] = ValidationChecker.DeterminismErrorString + result.toString();
+            this.predicateErrors[index] = this.determinismErrorString() + result.toString();
         }
 
         if (!result && index !== undefined) {
@@ -58,9 +66,9 @@ export default class ValidationChecker {
         let states: State[] = turingMachine.states.filter(s => s.Name.toLowerCase() === filterValue);
 
         if (states.length === 0) {
-            result = new ValidationResult(undefined, `\"${value}\" ist kein Zustand`);
+            result = new ValidationResult(undefined, `\"${value}\" ${this.i18n.lookUp("isNotA") + this.i18n.lookUp("state")}`);
             if (value === "") {
-                result.error = this.emptyLabelStringError("Zustand");
+                result.error = this.emptyLabelStringError(this.i18n.lookUp("state"));
             }
         }
 
@@ -81,9 +89,9 @@ export default class ValidationChecker {
         let tape_alphabets: string[] = turingMachine.tape_alphabet.filter(s => s.toLowerCase() === filterValue);
 
         if (tape_alphabets.length === 0) {
-            result = new ValidationResult(undefined, `\"${value}\" ist kein Arbeitsbuchstabe`);
+            result = new ValidationResult(undefined, `\"${value}\" ${this.i18n.lookUp("isNotA") + " " + this.i18n.lookUp("tape-letter")}`);
             if (value === "") {
-                result.error = this.emptyLabelStringError("Schreibwert");
+                result.error = this.emptyLabelStringError(this.i18n.lookUp("manipulation-value"));
             }
         }
 
@@ -130,7 +138,7 @@ export default class ValidationChecker {
     public checkDeterminismInState(tm: TuringMachine, state: State): ValidationResult | null {
         let isDeterministicState: ValidationResult | null = tm.validateDeterminismInState(state);
         this.predicateErrors[this.predicateErrors.length - 1] = isDeterministicState ?
-            ValidationChecker.DeterminismErrorString + isDeterministicState.toString() :
+            this.determinismErrorString() + isDeterministicState.toString() :
             "";
         return isDeterministicState;
     }
@@ -140,13 +148,13 @@ export default class ValidationChecker {
         let result: string[] = tm.tape_alphabet.filter(option => option.toLowerCase() === filterValue);
 
         if (value === "~") {
-            return new ValidationResult(undefined, `Prädikat \"${value}\" nicht gefunden`);
+            return new ValidationResult(undefined, `${this.i18n.lookUp("predicate")} \"${value}\" ${this.i18n.lookUp("notFound")}`);
         }
 
         if (result.length === 0 && filterValue !== "") {
-            return new ValidationResult(undefined, `Prädikat \"${value}\" nicht gefunden`);
+            return new ValidationResult(undefined, `${this.i18n.lookUp("predicate")} \"${value}\" ${this.i18n.lookUp("notFound")}`);
         } else if (value === "") {
-            return new ValidationResult(undefined, this.emptyLabelStringError("Prädikat"));
+            return new ValidationResult(undefined, this.emptyLabelStringError(this.i18n.lookUp("predicate")));
         }
 
         return null;
@@ -162,12 +170,12 @@ export default class ValidationChecker {
         }
 
         if (r.length > 0) {
-            let message: string = `${value} wird bereits genutzt`;
+            let message: string = `${value} ${this.i18n.lookUp("inUse")}`;
             result = new ValidationResult(undefined, message);
         }
 
         if (value.trim() === "") {
-            result = new ValidationResult(undefined, this.emptyLabelStringError("Zustandsname"));
+            result = new ValidationResult(undefined, this.emptyLabelStringError(this.i18n.lookUp("state-name")));
         }
 
         this.stateNameError = result == null ? "" : result.toString();

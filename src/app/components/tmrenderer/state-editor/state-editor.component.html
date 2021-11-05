@@ -1,6 +1,6 @@
 <div *ngIf="this.state" class="topRight">
     <mat-card class="card">
-        <mat-card-subtitle>Zustand bearbeiten</mat-card-subtitle>
+        <mat-card-subtitle>{{this.i18n.lookUp("edit-state")}}</mat-card-subtitle>
         <div style="display: inline-block; height: 100%; width: 100%">
 
             <mat-card-title *ngIf="!isEditingStateName" (dblclick)="this.isEditingStateName = true">
@@ -11,7 +11,7 @@
 
         <div *ngIf="isEditingStateName">
             <mat-form-field appearance="fill">
-                <mat-label>Zustandsname</mat-label>
+                <mat-label>{{this.i18n.lookUp("state-name")}}</mat-label>
                 <input (focusout)="this.onFocusOut($event, stateName)" #stateName (keyup)="this.onStateNameChanged($event, stateName)"
                        type="text" matInput [placeholder]="this.state?.Name!">
                 <mat-icon matSuffix>mode_edit</mat-icon>
@@ -25,8 +25,8 @@
         </div>
 
         <span>
-            <mat-checkbox [labelPosition]="this.lPos" color="primary" style="margin-right: 10px" [checked]="this.isInitialState()" (change)="this.onInitialStateChanged($event.checked)">Initialzustand?</mat-checkbox>
-            <mat-checkbox [labelPosition]="this.lPos" color="primary" [checked]="this.isFinalState()" (change)="this.onFinalStateChanged($event.checked)">Endzustand?</mat-checkbox>
+            <mat-checkbox [labelPosition]="this.lPos" color="primary" style="margin-right: 10px" [checked]="this.isInitialState()" (change)="this.onInitialStateChanged($event.checked)">{{this.i18n.lookUp("initial-state")}}?</mat-checkbox>
+            <mat-checkbox [labelPosition]="this.lPos" color="primary" [checked]="this.isFinalState()" (change)="this.onFinalStateChanged($event.checked)">{{this.i18n.lookUp("final-state")}}?</mat-checkbox>
         </span>
 
         <mat-divider></mat-divider>
