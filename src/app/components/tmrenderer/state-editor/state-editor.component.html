@@ -55,15 +55,15 @@
                 <span style="display: inline-block;">
                     <button type="button" style="margin-right: 5px" [style.background-color]="this.isSelectedButton(i, 'L')"
                             mat-mini-fab (click)="this.onDirectionChanged(i, 'L', 0)">
-                        <mat-icon>chevron_left</mat-icon>
+                        <mat-icon>L</mat-icon>
                     </button>
                     <button type="button" style="margin-right: 5px" [style.background-color]="this.isSelectedButton(i, 'N')"
                             mat-mini-fab (click)="this.onDirectionChanged(i, 'N', 1)">
-                        <mat-icon>remove</mat-icon>
+                        <mat-icon>N</mat-icon>
                     </button>
                     <button type="button" [style.background-color]="this.isSelectedButton(i, 'R')"
                             mat-mini-fab (click)="this.onDirectionChanged(i, 'R', 2)">
-                        <mat-icon>chevron_right</mat-icon>
+                        <mat-icon>R</mat-icon>
                     </button>
                 </span>
             </form>
