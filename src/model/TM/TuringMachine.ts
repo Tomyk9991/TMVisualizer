@@ -4,13 +4,8 @@ import ValidationResult from "./Validation/ValidationResult";
 
 export default class TuringMachine {
     public static Instance: TuringMachine;
-    private static dirs: string[] = ["L", "R", "N"];
     constructor(public states: State[], public input_alphabet: string[], public tape_alphabet: string[], public transitions: Transition[]) {
         TuringMachine.Instance = this;
-    }
-
-    public getDirections(): string[] {
-        return TuringMachine.dirs;
     }
 
     //returns a reference to the transitions that break the determinism of a turing machine

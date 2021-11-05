@@ -17,7 +17,6 @@ import {TMRendererService} from "../../../services/t-m-renderer.service";
 import AutoCompleteHelper, {TransitionPart} from "./AutoCompleteHelper";
 import ValidationResult from "../../../../model/TM/Validation/ValidationResult";
 import ValidationChecker from "../../../../model/TM/Validation/ValidationChecker";
-import {MatFormField, MatFormFieldControl} from "@angular/material/form-field";
 
 @Component({
     selector: 'app-state-editor',
@@ -31,6 +30,7 @@ import {MatFormField, MatFormFieldControl} from "@angular/material/form-field";
 export class StateEditorComponent implements OnInit, AfterViewInit {
     public state?: State;
     public turingMachine?: TuringMachine;
+    private validationTasks: ((value: string, index: number) => void)[] = [];
 
     private static _hasState: boolean = false;
     public static hasState(): boolean { return StateEditorComponent._hasState; }
@@ -53,9 +53,9 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
     }
 
     public readonly labels: string[] = [
-        "Predicate",
-        "Next state",
-        "Manipulation value",
+        "Prädikat",
+        "Nächster Zustand",
+        "Schreibwert",
     ];
 
     public readonly lPos: 'before' | 'after' = 'before'
@@ -75,6 +75,10 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
                 this.ref.markForCheck();
             }
         });
+
+        this.validationTasks.push(this.performPredicateValidation);
+        this.validationTasks.push(this.performNextStateValidation);
+        this.validationTasks.push(this.performManipulationValueValidation);
 
         this.validationChecker = new ValidationChecker();
         this.updateAutoCompleteHelpers();
@@ -142,28 +146,8 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
                         let result = this.formHelpers[i][j].filter(value);
 
                         // Validation of turing machine
-                        if (this.formHelpers[i][j].transitionPart === TransitionPart.Predicate) {
-                            this.validationChecker.checkDeterminismInState(AutoCompleteHelper.TM, <State>this.state);
-
-                            for (let k = 0; k < this.numTransitions; k++) {
-                                this.validationChecker.checkPredicateInput(
-                                    AutoCompleteHelper.TM,
-                                    this.formHelpers[k][j].formControl.value,
-                                    k);
-                            }
-                            this.errorMessage = this.validationChecker.prettyPrint();
-                        } else if (this.formHelpers[i][j].transitionPart === TransitionPart.NextState) {
-                            this.validationChecker.checkNextStateInput(AutoCompleteHelper.TM,
-                                this.formHelpers[i][j].formControl.value, i
-                            );
-                            this.errorMessage = this.validationChecker.prettyPrint();
-                        } else if (this.formHelpers[i][j].transitionPart === TransitionPart.ManipulationValue) {
-                            this.validationChecker.checkManipulationValue(AutoCompleteHelper.TM,
-                                this.formHelpers[i][j].formControl.value, i
-                            );
-
-                            this.errorMessage = this.validationChecker.prettyPrint();
-                        }
+                        let transitionPartToIndex: number = this.formHelpers[i][j].transitionPart;
+                        this.validationTasks[transitionPartToIndex].call(this, this.formHelpers[i][j].formControl.value, i);
 
                         return result;
                     })
@@ -173,6 +157,33 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
+    }
+
+    private performManipulationValueValidation(value: string, index: number): void {
+        this.validationChecker.checkManipulationValue(AutoCompleteHelper.TM,
+            value, index
+        );
+
+        this.errorMessage = this.validationChecker.prettyPrint();
+    }
+
+    private performNextStateValidation(value: string, index: number): void {
+        this.validationChecker.checkNextStateInput(AutoCompleteHelper.TM,
+            value, index
+        );
+        this.errorMessage = this.validationChecker.prettyPrint();
+    }
+
+    private performPredicateValidation(value: string, index: number): void {
+        this.validationChecker.checkDeterminismInState(AutoCompleteHelper.TM, <State>this.state);
+
+        for (let k = 0; k < this.numTransitions; k++) {
+            this.validationChecker.checkPredicateInput(
+                AutoCompleteHelper.TM,
+                this.formHelpers[k][0].formControl.value,
+                k);
+        }
+        this.errorMessage = this.validationChecker.prettyPrint();
     }
 
     public hasErrors(): boolean {
@@ -214,7 +225,7 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
         return (<string>targetTransition.direction) === direction ? primary : unselected;
     }
 
-    public onDirectionChanged(i: number, newDirection: string, buttonNumber: number): void {
+    public onDirectionChanged(i: number, newDirection: string): void {
         let allTransitions: Transition[] = this.turingMachine?.transitions.filter(t => t.currentState == this.state) ?? [];
         let targetTransition: Transition = allTransitions[i];
 
@@ -249,6 +260,18 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
         }
     }
 
+    public onFocusOut(event: any, element: HTMLInputElement): void {
+        let result: ValidationResult | null = this.validationChecker.checkStateName(TuringMachine.Instance, element.value, (<State>this.state).Name);
+
+        if (!result) {
+            (<State>this.state).Name = element.value;
+        } else {
+            this.validationChecker.checkStateName(TuringMachine.Instance, (<State>this.state).Name, (<State>this.state).Name);
+        }
+
+        this.errorMessage = this.validationChecker.prettyPrint();
+        this.isEditingStateName = false;
+    }
 
 
 

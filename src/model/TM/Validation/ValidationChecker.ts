@@ -3,8 +3,8 @@ import ValidationResult from "./ValidationResult";
 import TuringMachine from "../TuringMachine";
 
 export default class ValidationChecker {
-    private static readonly DeterminismErrorString: string = "Determinism error:\t";
-    private emptyLabelStringError(label: string): string { return `${label} can't be empty`}
+    private static readonly DeterminismErrorString: string = "Determinismusfehler:\t";
+    private emptyLabelStringError(label: string): string { return `${label} kann nicht leer sein`}
 
     private predicateErrors: string[] = [];
     private nextStateErrors: string[] = [];
@@ -58,9 +58,9 @@ export default class ValidationChecker {
         let states: State[] = turingMachine.states.filter(s => s.Name.toLowerCase() === filterValue);
 
         if (states.length === 0) {
-            result = new ValidationResult(undefined, `\"${value}\" is not a state`);
+            result = new ValidationResult(undefined, `\"${value}\" ist kein Zustand`);
             if (value === "") {
-                result.error = this.emptyLabelStringError("State");
+                result.error = this.emptyLabelStringError("Zustand");
             }
         }
 
@@ -75,38 +75,15 @@ export default class ValidationChecker {
         return result;
     }
 
-    public checkDirectionValue(turingMachine: TuringMachine, value: string, index?: number): ValidationResult | null {
-        let result: ValidationResult | null = null;
-        const filterValue: string = value.toLowerCase();
-        let directions: string[] = turingMachine.getDirections().filter(s => s.toLowerCase() === filterValue);
-
-        if (directions.length === 0) {
-            result = new ValidationResult(undefined, `\"${value}\" is not a direction`);
-            if (value === "") {
-                result.error = this.emptyLabelStringError("Direction");
-            }
-        }
-
-        if (result && index !== undefined) {
-            this.directionErrors[index] = result.toString();
-        }
-
-        if (!result && index !== undefined) {
-            this.directionErrors[index] = "";
-        }
-
-        return result;
-    }
-
     public checkManipulationValue(turingMachine: TuringMachine, value: string, index?: number): ValidationResult | null {
         let result: ValidationResult | null = null;
         const filterValue: string = value.toLowerCase();
         let tape_alphabets: string[] = turingMachine.tape_alphabet.filter(s => s.toLowerCase() === filterValue);
 
         if (tape_alphabets.length === 0) {
-            result = new ValidationResult(undefined, `\"${value}\" is not a tape letter`);
+            result = new ValidationResult(undefined, `\"${value}\" ist kein Arbeitsbuchstabe`);
             if (value === "") {
-                result.error = this.emptyLabelStringError("Manipulation value");
+                result.error = this.emptyLabelStringError("Schreibwert");
             }
         }
 
@@ -163,13 +140,13 @@ export default class ValidationChecker {
         let result: string[] = tm.tape_alphabet.filter(option => option.toLowerCase() === filterValue);
 
         if (value === "~") {
-            return new ValidationResult(undefined, `Predicate \"${value}\" not found`);
+            return new ValidationResult(undefined, `Prädikat \"${value}\" nicht gefunden`);
         }
 
         if (result.length === 0 && filterValue !== "") {
-            return new ValidationResult(undefined, `Predicate \"${value}\" not found`);
+            return new ValidationResult(undefined, `Prädikat \"${value}\" nicht gefunden`);
         } else if (value === "") {
-            return new ValidationResult(undefined, this.emptyLabelStringError("Predicate"));
+            return new ValidationResult(undefined, this.emptyLabelStringError("Prädikat"));
         }
 
         return null;
@@ -185,12 +162,12 @@ export default class ValidationChecker {
         }
 
         if (r.length > 0) {
-            let message: string = `${value} is already in use`;
+            let message: string = `${value} wird bereits genutzt`;
             result = new ValidationResult(undefined, message);
         }
 
         if (value.trim() === "") {
-            result = new ValidationResult(undefined, this.emptyLabelStringError("State name"));
+            result = new ValidationResult(undefined, this.emptyLabelStringError("Zustandsname"));
         }
 
         this.stateNameError = result == null ? "" : result.toString();
