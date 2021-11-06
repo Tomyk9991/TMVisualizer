@@ -1,15 +1,14 @@
 import IDrawer from "./IDrawer";
 import * as p5 from "p5";
 import DrawerManager from "./managers/DrawerManager";
+import {I18nService} from "../../../services/i18n.service";
 
 export default class TextDescriptionDrawer implements IDrawer {
-    private displayText: string =
-        "Press 'space' on a state to edit it\n" +
-        "Press 'c' on an empty space to create a new state\n" +
-        "Press 'r' to a state to delete the state";
+    private displayText: string = "";
 
     public constructor() {
         DrawerManager.drawQueue.push(this);
+        this.displayText = I18nService.Instance.lookUp("using-description")
     }
 
     draw(p: any, ctx: p5): void {

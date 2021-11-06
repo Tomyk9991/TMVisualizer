@@ -10,6 +10,7 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {DownloadDialogComponent} from "../download-dialog/download-dialog.component";
 import constructFromTM from "../../../../model/TM/TMToString";
 import {FileStructure} from "../../../../model/TM/FileStructure";
+import {I18nService} from "../../../services/i18n.service";
 
 @Component({
     selector: 'app-header',
@@ -20,7 +21,7 @@ export class HeaderComponent implements OnInit {
 
     private readFileBefore: boolean = false;
     private sourceText: string = "";
-    constructor(private tmRendererService: TMRendererService, private dialog: MatDialog) {
+    constructor(public i18n: I18nService, private tmRendererService: TMRendererService, private dialog: MatDialog) {
     }
 
     ngOnInit(): void {
@@ -217,8 +218,8 @@ export class HeaderComponent implements OnInit {
     public onDownloadClicked(): void {
         if(this.readFileBefore) {
             const dialogRef: MatDialogRef<DownloadDialogComponent> = this.dialog.open(DownloadDialogComponent, {
-                width: '20%',
-                height: '21%'
+                width: 'auto',
+                height: 'auto'
             });
 
             dialogRef.afterClosed().subscribe((result) => {

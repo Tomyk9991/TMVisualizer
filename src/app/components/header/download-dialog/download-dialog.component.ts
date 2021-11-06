@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MatDialogRef} from "@angular/material/dialog";
+import {I18nService} from "../../../services/i18n.service";
 
 @Component({
     selector: 'app-download-dialog',
@@ -9,7 +10,7 @@ import {MatDialogRef} from "@angular/material/dialog";
 export class DownloadDialogComponent implements OnInit {
     public reuseStructure: boolean = true;
 
-    constructor(public dialogRef: MatDialogRef<DownloadDialogComponent>) {
+    constructor(public i18n: I18nService, public dialogRef: MatDialogRef<DownloadDialogComponent>) {
     }
 
     ngOnInit(): void {

@@ -2,7 +2,7 @@
     <mat-toolbar-row>
         <button mat-flat-button color="primary" (click)="this.onDownloadClicked()">
             <mat-icon>download</mat-icon>
-            Download file
+            {{this.i18n.lookUp("download-file")}}
         </button>
 
         <!--Used to make file input possible. Its not displayed though -->
@@ -10,7 +10,7 @@
 
         <button mat-flat-button color="primary" (click)="fileInputElement.click()">
             <mat-icon>upload</mat-icon>
-            Upload file
+            {{this.i18n.lookUp("upload-file")}}
         </button>
 
     </mat-toolbar-row>

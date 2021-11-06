@@ -1,11 +1,11 @@
-<h1 mat-dialog-title>Download file</h1>
+<h1 mat-dialog-title>{{this.i18n.lookUp("download-file")}}</h1>
 <div>
-    <p>Do you want to keep the file structure?</p>
+    <p>{{this.i18n.lookUp("download-file-prompt")}}</p>
     <section>
-        <mat-checkbox [checked]="this.reuseStructure" (change)="this.onCheckBoxChanged($event.checked)">Keep structure</mat-checkbox>
+        <mat-checkbox [checked]="this.reuseStructure" (change)="this.onCheckBoxChanged($event.checked)">{{this.i18n.lookUp("keep")}}</mat-checkbox>
     </section>
 </div>
 <div mat-dialog-actions>
-    <button mat-button (click)="this.onCancelDialog()">Cancel</button>
+    <button mat-button (click)="this.onCancelDialog()">{{i18n.lookUp("cancel")}}</button>
     <button mat-button [mat-dialog-close]="this.reuseStructure" cdkFocusInitial>Ok</button>
 </div>
