@@ -11,6 +11,7 @@ import {DownloadDialogComponent} from "../download-dialog/download-dialog.compon
 import constructFromTM from "../../../../model/TM/TMToString";
 import {FileStructure} from "../../../../model/TM/FileStructure";
 import {I18nService} from "../../../services/i18n.service";
+import {ChangeAlphabetDialogComponent} from "../change-alphabet-dialog/change-alphabet-dialog.component";
 
 @Component({
     selector: 'app-header',
@@ -21,6 +22,7 @@ export class HeaderComponent implements OnInit {
 
     private readFileBefore: boolean = false;
     private sourceText: string = "";
+
     constructor(public i18n: I18nService, private tmRendererService: TMRendererService, private dialog: MatDialog) {
     }
 
@@ -177,9 +179,80 @@ export class HeaderComponent implements OnInit {
             "# Geben Sie hier die akzeptierenden Zustände an.\n" +
             "acc_states = \tq_e";
 
-        this.sourceText = target2;
+        let target3: string = "# Informationen zum Abgabeformat\n" +
+            "# Informationen zum Abgabeformat\n" +
+            "# \n" +
+            "# Zeilen die mit einem '#' beginnen werden als Kommentare verstanden. Diese können Sie selbst\n" +
+            "# hinzufügen und erweitern. Diese können auch \"inline\" hinzugefügt werden.\n" +
+            "# \n" +
+            "# Alles nach der Zeile mit dem Token\t\"\"\"Abgabe:\"\"\"\t   wird zu Ihrer Lösung gezählt.\n" +
+            "# Schreiben oder ändern Sie vor diesem Token nichts außer Kommentare und wo gefordert Ihren Namen und den \n" +
+            "# Ihrer Gruppenmitglieder!\n" +
+            "#\n" +
+            "# Sie können Ihre Abgabe auf das richtige Format mit Hilfe des 'Submission-Tester' (siehe Moodle Kurs) testen.\n" +
+            "# Abgaben die nicht das richtige Format einhalten werden nicht korrigiert! \n" +
+            "# Nutzen Sie deshalb den Submission Tester vor direkt vor Abgabe Ihrer Lösung nocheinmal.\n" +
+            "#\n" +
+            "#\n" +
+            "#\n" +
+            "#\n" +
+            "# Passen Sie folgende Zeilen an: Name, Gruppenmitglieder\n" +
+            "\n" +
+            "\"\"\"\n" +
+            "Name = Thomas Kraus                         # Geben Sie rechts von '=' den vollständigen Namen der abgebenden Person an. Bsp: Name = Camila Cool\n" +
+            "Gruppenmitglieder =\t\t\t\t\t\t\t# Geben Sie rechts von '=' die vollständigen Namen >aller< anderen Gruppenmitglieder durch ',' getrennt an. Bsp: Gruppenmitglieder = Theodore Theory, Ivy Incognito\n" +
+            "Aufgabe = B3A3\t\t\t\t\t\t\t\t# In dieser Zeile nichts verändern!\n" +
+            "Aufgabentyp = turingmachine\t\t\t\t\t# In dieser Zeile nichts verändern!\n" +
+            "\"\"\"\n" +
+            "\n" +
+            "\n" +
+            "# Informationen zu Turingmaschinen-Aufgaben:\n" +
+            "#\n" +
+            "# Die Reihenfolge der Schlüsselwörter (input_alphabet, transitions, start_state, acc_state) darf nicht verändert werden!\n" +
+            "# In Zustandsnamen dürfen keine Sonderzeichen, bis auf den Unterstrich, vorkommen. \n" +
+            "#\n" +
+            "# Das Arbeitsalphabet muss nicht angegeben werden. Dieses ergibt sich aus den Zeichen in der Transitionsfunktion, die keine Eingabezeichen sind.\n" +
+            "# Als Blanksymbol muss immer der Unterstrich benutzt werden: _\n" +
+            "#\n" +
+            "# Die Transitionsfunktion darf partiell angegeben werden. Die Maschine wird durch den Interpreter automatisch vervollständigt, d.h. nicht definierte Übergänge werden in den Zustand !error_state! geleitet.\n" +
+            "#\n" +
+            "\"\"\"Abgabe:\"\"\"\n" +
+            "input_alphabet = \ta\n" +
+            "transitions =\tstart, a      -> start, a, R\n" +
+            "\t\t\t\tstart, _      -> trenner, -, R\n" +
+            "\t\t\t\ttrenner, _      -> back, a, L\n" +
+            "\t\t\t\tback, -      -> back, -, L\n" +
+            "\t\t\t\tback, a      -> back, a, L\n" +
+            "\t\t\t\tback, _      -> markA, _, R\n" +
+            "\t\t\t\tmarkA, a      -> goEnd, x, R\n" +
+            "\t\t\t\tgoEnd, a      -> goEnd, a, R\n" +
+            "\t\t\t\tgoEnd, -      -> copy, -, R\n" +
+            "\t\t\t\tcopy, a      -> copy_a, a-, R\n" +
+            "\t\t\t\tcopy_a, a      -> copy_a, a, R\n" +
+            "\t\t\t\tcopy_a, a'      -> copy_a, a', R\n" +
+            "\t\t\t\tcopy_a, _      -> cpy_back, a', N\n" +
+            "\t\t\t\tcpy_back, a      -> cpy_back, a, L\n" +
+            "\t\t\t\tcpy_back, a'      -> cpy_back, a', L\n" +
+            "\t\t\t\tcpy_back, a-      -> copy, a, R\n" +
+            "\t\t\t\tcopy, a'      -> cclean, a, R\n" +
+            "\t\t\t\tcclean, a'      -> cclean, a, R\n" +
+            "\t\t\t\tcclean, _      -> cHead, _, L\n" +
+            "\t\t\t\tcopy, _      -> cEnd, _, N\n" +
+            "\t\t\t\tcHead, -      -> cEnd, -, L\n" +
+            "\t\t\t\tcHead, a      -> cHead, a, L\n" +
+            "\t\t\t\tcEnd, x      -> nextA, x, R\n" +
+            "\t\t\t\tnextA, a      -> markA, a, N\n" +
+            "\t\t\t\tcEnd, a      -> cEnd, a, L\n" +
+            "\t\t\t\tnextA, -      -> finish, -, R\n" +
+            "start_state = \tstart\n" +
+            "acc_states = \tfinish"
+
+        this.sourceText = target3;
         this.readFileBefore = true;
-        let tm: TuringMachine = constructFromString(target2);
+        let tm: TuringMachine = constructFromString(target3);
+
+        console.log(tm);
+
         this.tmRendererService.render(tm);
     }
 
@@ -192,8 +265,12 @@ export class HeaderComponent implements OnInit {
                 let data: string = target.result;
 
                 let tm: TuringMachine = constructFromString(data);
+
                 this.readFileBefore = true;
                 this.sourceText = data;
+                console.log(tm);
+
+                this.tmRendererService.render(tm);
             };
 
             reader.readAsText(file);
@@ -205,7 +282,7 @@ export class HeaderComponent implements OnInit {
         let comments: string[] = [];
         let fileStructure: FileStructure[] = [];
 
-        if(keepPreviousFileStructure) {
+        if (keepPreviousFileStructure) {
             compilerHints = getCompilerHintLines(this.sourceText);
             comments = getCommentLines(this.sourceText);
             fileStructure = getLineByLineStructure(this.sourceText);
@@ -216,7 +293,7 @@ export class HeaderComponent implements OnInit {
     }
 
     public onDownloadClicked(): void {
-        if(this.readFileBefore) {
+        if (this.readFileBefore) {
             const dialogRef: MatDialogRef<DownloadDialogComponent> = this.dialog.open(DownloadDialogComponent, {
                 width: 'auto',
                 height: 'auto'
@@ -241,5 +318,21 @@ export class HeaderComponent implements OnInit {
         document.body.appendChild(elem);
         elem.click();
         document.body.removeChild(elem);
+    }
+
+    public tapeAlphabetEditClicked(): void {
+        this.openAlphabetDialog("tape");
+    }
+
+    public inputAlphabetEditClicked(): void {
+        this.openAlphabetDialog("input");
+    }
+
+    private openAlphabetDialog(data: string) {
+        this.dialog.open(ChangeAlphabetDialogComponent, {
+            width: 'auto',
+            height: 'auto',
+            data: { alphabet: data }
+        });
     }
 }

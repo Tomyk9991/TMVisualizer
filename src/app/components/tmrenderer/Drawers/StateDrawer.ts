@@ -93,26 +93,31 @@ export default class StateDrawer implements IDrawer, IInteractable, IKeyboardCal
 
 
     interact(p: any, ctx: p5): void {
-        if (this == StateDrawer.targetInstance || StateDrawer.targetInstance == null) {
+        let element: Element | null = document.activeElement;
 
-            let mouseVector: p5.Vector = ctx.createVector(p.mouseX, p.mouseY);
-            if ((p5.Vector.dist(this.position, mouseVector) < this.circleRadius)) {
-                this.mouseOverlapping = true;
-            } else {
-                this.mouseOverlapping = false;
-            }
+        if (element instanceof HTMLBodyElement) {
+            if (this == StateDrawer.targetInstance || StateDrawer.targetInstance == null) {
 
-            if (p.mouseIsPressed && (this.mouseOverlapping || this.isMouseTargeted)) {
-                this.isMouseTargeted = true;
-                StateDrawer.targetInstance = this;
-            } else {
-                this.isMouseTargeted = false;
-                StateDrawer.targetInstance = null;
-            }
+                let mouseVector: p5.Vector = ctx.createVector(p.mouseX, p.mouseY);
+                let dist: number = this.position.dist(mouseVector);
+                //if ((p5.Vector.dist(this.position, mouseVector) < this.circleRadius)) {
+                if (dist < this.circleRadius) {
+                    this.mouseOverlapping = true;
+                } else {
+                    this.mouseOverlapping = false;
+                }
+                if (p.mouseIsPressed && (this.mouseOverlapping || this.isMouseTargeted)) {
+                    this.isMouseTargeted = true;
+                    StateDrawer.targetInstance = this;
+                } else {
+                    this.isMouseTargeted = false;
+                    StateDrawer.targetInstance = null;
+                }
 
-            if (this.isMouseTargeted && p.mouseButton === p.LEFT) {
-                this.position.x = p.mouseX;
-                this.position.y = p.mouseY;
+                if (this.isMouseTargeted && p.mouseButton === p.LEFT) {
+                    this.position.x = p.mouseX;
+                    this.position.y = p.mouseY;
+                }
             }
         }
     }

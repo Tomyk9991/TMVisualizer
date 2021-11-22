@@ -1,0 +1,7 @@
+.addLetterButton {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+    height: 40px;
+    width: 100%;
+}
