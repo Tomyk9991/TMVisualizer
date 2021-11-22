@@ -85,9 +85,29 @@ export class I18nService {
             "de": "Arbeitsbuchstabe",
             "en": "tape letter"
         },
+        "input-letter": {
+            "de": "Eingabebuchstabe",
+            "en": "Input letter"
+        },
         "inUse": {
             "de": "wird bereits genutzt",
             "en": "is already in use"
+        },
+        "tape-alphabet": {
+            "de": "Arbeitsalphabet",
+            "en": "Tape alphabet"
+        },
+        "input-alphabet": {
+            "de": "Eingabealphabet",
+            "en": "Input alphbet"
+        },
+        "edit-tape-alphabet": {
+            "de": "Arbeitsalphabet bearbeiten",
+            "en": "Edit tape alphabet"
+        },
+        "edit-input-alphabet": {
+            "de": "Eingabealphabet bearbeiten",
+            "en": "Edit Input alphbet"
         }
     };
 

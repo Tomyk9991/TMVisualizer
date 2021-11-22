@@ -95,8 +95,10 @@ function filterForStates(lines: string[], startState: string, acc_states: string
         if (line.includes("->")) {
             line = line.trim();
             let state: string = line.split("->")[0].split(',')[0].trim();
+            let state2: string = line.split("->")[1].split(',')[0].trim();
 
             states.add(state);
+            states.add(state2);
         }
     }
 

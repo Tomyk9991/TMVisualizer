@@ -132,6 +132,8 @@ function resetSketch(p: any, resetPositions: boolean): void {
         statePositions = [];
     }
 
+    if (!tm) return;
+
     for (let i = 0; i < tm.states.length; i++) {
         // let x: number = <number>TMRendererComponent.p5?.random(50, TMRendererComponent.screenWidth - 50);
         // let y: number = <number>TMRendererComponent.p5?.random(50,  TMRendererComponent.screenHeight - 50);

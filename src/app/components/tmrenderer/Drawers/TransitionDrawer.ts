@@ -189,6 +189,9 @@ export default class TransitionDrawer implements IDrawer, IRenderPipelineCompone
     }
 
     private linearTransformationLerp(lerpValue: number): p5.Vector {
+        if (!this.nextStateDrawer) {
+            console.log("something unexpetected undefined");
+        }
         let direction: p5.Vector = p5.Vector.sub(this.nextStateDrawer.position, this.currentStateDrawer.position);
 
         let start: p5.Vector = p5.Vector.add(this.currentStateDrawer.position, direction.setMag(this.currentStateDrawer.circleRadius));

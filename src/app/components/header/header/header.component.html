@@ -13,5 +13,18 @@
             {{this.i18n.lookUp("upload-file")}}
         </button>
 
+        <mat-divider [inset]="true" [vertical]="true"></mat-divider>
+
+        <button mat-flat-button color="primary" (click)="this.tapeAlphabetEditClicked()">
+            <mat-icon>edit</mat-icon>
+            {{this.i18n.lookUp("tape-alphabet")}}
+        </button>
+
+        <button mat-flat-button color="primary" (click)="this.inputAlphabetEditClicked()">
+            <mat-icon>edit</mat-icon>
+            {{this.i18n.lookUp("input-alphabet")}}
+        </button>
+
+
     </mat-toolbar-row>
 </mat-toolbar>

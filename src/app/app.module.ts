@@ -23,6 +23,7 @@ import { DownloadDialogComponent } from './components/header/download-dialog/dow
 import {MatDialogModule} from "@angular/material/dialog";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { ChangeAlphabetDialogComponent } from './components/header/change-alphabet-dialog/change-alphabet-dialog.component';
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
         TMRendererComponent,
         StateEditorComponent,
         TransitionEntryComponent,
-        DownloadDialogComponent
+        DownloadDialogComponent,
+        ChangeAlphabetDialogComponent
     ],
     imports: [
         HttpClientModule,

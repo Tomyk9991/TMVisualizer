@@ -1,0 +1,29 @@
+<mat-label>{{this.i18n.lookUp(this.translationFor(0))}}</mat-label>
+
+<div *ngFor="let letter of this.alphabet; let i = index">
+    <div style="display: inline-block; height: 100%; width: 100%">
+        <mat-card-title *ngIf="!this.isEditingAlphabet[i]" (dblclick)="this.isEditingAlphabet[i] = true">
+            {{letter}}
+            <mat-icon style="cursor: pointer; color: #c2185b; float: right" (click)="this.removeLetter(i)" matSuffix>delete</mat-icon>
+            <mat-icon style="cursor: pointer; float: right" (click)="this.isEditingAlphabet[i] = true" matSuffix>mode_edit</mat-icon>
+        </mat-card-title>
+    </div>
+
+    <div *ngIf="this.isEditingAlphabet[i]">
+        <mat-form-field appearance="fill">
+            <mat-label>{{this.i18n.lookUp(this.translationFor(1))}}</mat-label>
+            <input (focusout)="this.onFocusOut($event, alphabetLetter, i)" #alphabetLetter (keyup)="this.onStateNameChanged($event, alphabetLetter, i)"
+                   type="text" matInput [placeholder]="this.alphabet[i]" [value]="this.alphabet[i]">
+            <mat-icon matSuffix>mode_edit</mat-icon>
+        </mat-form-field>
+    </div>
+    <mat-divider></mat-divider>
+</div>
+
+<label [innerText]="this.errorMessage"></label>
+
+<div class="addLetterButton">
+    <button mat-mini-fab color="primary" [disabled]="this.hasErrors()" (click)="this.addLetter()">
+        <mat-icon>queue</mat-icon>
+    </button>
+</div>

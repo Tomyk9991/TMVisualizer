@@ -117,8 +117,6 @@ export class StateEditorComponent implements OnInit, AfterViewInit {
         this.numTransitions = transitions.length;
 
         let tape_alphabet: string[] = <string[]>this.turingMachine?.tape_alphabet;
-        let directions: string[] = ["L", "R", "N"];
-
         this.formHelpers = [];
 
         if (AutoCompleteHelper.tmRenderService === undefined) {
